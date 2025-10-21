@@ -31,13 +31,20 @@ const docs = google.docs({ version: 'v1', auth: oauth2Client });
 // Função para garantir autenticação
 async function ensureAuth() {
     try {
+        // Se já temos refresh token, usa ele
+        if (process.env.GOOGLE_REFRESH_TOKEN) {
+            oauth2Client.setCredentials({
+                refresh_token: process.env.GOOGLE_REFRESH_TOKEN
+            });
+        }
+        
         const token = await oauth2Client.getAccessToken();
         if (!token) {
-            throw new Error('Não autenticado. Acesse /auth primeiro.');
+            throw new Error('Não autenticado');
         }
         return true;
     } catch (error) {
-        console.error('Erro de autenticação:', error);
+        console.log('🔐 Redirecionando para autenticação OAuth...');
         throw error;
     }
 }
@@ -502,7 +509,7 @@ function isLogged(req, res, next) {
 
 // --- ROTAS PRINCIPAIS ---
 app.post('/gerar-documento', isLogged, async (req, res) => {
-    let newDocId = null; // ← DECLARAR AQUI (fora do try)
+    let newDocId = null; 
     
     try {
         await ensureAuth();
@@ -593,22 +600,28 @@ app.get('/auth', (req, res) => {
 
 app.get('/oauth2callback', async (req, res) => {
     const { code } = req.query;
+    
     try {
         const { tokens } = await oauth2Client.getToken(code);
+        
+        // SALVA O REFRESH TOKEN (em produção, use um banco de dados)
+        if (tokens.refresh_token) {
+            console.log('✅ Refresh token obtido com sucesso!');
+            // Em produção real, salve em um banco de dados
+            process.env.GOOGLE_REFRESH_TOKEN = tokens.refresh_token;
+        }
+        
         oauth2Client.setCredentials(tokens);
         
-        console.log('✅ Autenticação bem-sucedida!');
-        console.log('Refresh Token para .env:', tokens.refresh_token);
+        res.redirect('/');
         
-        res.send(`
-            <h1>Autenticação Concluída!</h1>
-            <p>Adicione este refresh_token ao seu arquivo .env:</p>
-            <code>GOOGLE_REFRESH_TOKEN=${tokens.refresh_token}</code>
-            <p><a href="/">Voltar à aplicação</a></p>
-        `);
     } catch (error) {
         console.error('Erro na autenticação:', error);
-        res.status(500).send('Erro na autenticação: ' + error.message);
+        res.send(`
+            <h1>Erro na Autenticação</h1>
+            <p>${error.message}</p>
+            <a href="/auth">Tentar novamente</a>
+        `);
     }
 });
 
@@ -638,8 +651,22 @@ app.post('/login', async (req, res) => {
     }
 });
 
-app.get('/', isLogged, (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/index.html'));
+app.get('/', isLogged, async (req, res) => {
+    try {
+        await ensureAuth();
+        res.sendFile(path.join(__dirname, 'public/index.html'));
+    } catch (error) {
+        console.log('🔐 Redirecionando para OAuth:', error.message);
+        const authUrl = oauth2Client.generateAuthUrl({
+            access_type: 'offline',
+            scope: [
+                'https://www.googleapis.com/auth/drive',
+                'https://www.googleapis.com/auth/documents'
+            ],
+            prompt: 'consent'
+        });
+        res.redirect(authUrl);
+    }
 });
 
 app.get('/logout', (req, res) => {
