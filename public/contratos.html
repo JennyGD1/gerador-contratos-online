@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerar Contratos - Maida Health</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/contratos.css"> 
+</head>
+<body>
+    
+    <nav> 
+        <ul>
+            <li class="logo"><i class="fas fa-heartbeat"></i></li>
+            <li><a href="index.html">Início</a></li>
+            <li><a href="contratos.html">Contratos</a></li>    
+        </ul>
+    </nav>
+
+    <div class="inicio" id="inicio" style="height: 200px; min-height: 200px;">
+        <h1 class="titulo-capa" style="font-size: 2em; padding: 20px;">Automação de Contratos</h1>
+    </div>
+    
+    <div class="partedois">
+        
+        <div class="conteudoindex" style="max-width: 1200px;">
+            <section class="secao-modelos">
+                <h2>1. Escolha o Modelo</h2>
+                <div id="template-options-grid" class="grid-modelos">
+                    
+                    <label class="template-card" data-template="Contrato Prestacao Servico">
+                        <i class="fas fa-file-signature"></i>
+                        <h3>Minuta Contrato Maida</h3>
+                        <p>Modelo padrão para contratação de terceiros.</p>
+                        <input type="radio" name="template-name" value="Contrato Prestacao Servico" checked style="display: none;">
+                    </label>
+
+                    <label class="template-card" data-template="Aditivo Contratual">
+                        <i class="fas fa-edit"></i>
+                        <h3>Aditivo Maida</h3>
+                        <p>Para acordos de alteração de contrato existente.</p>
+                        <input type="radio" name="template-name" value="Aditivo Contratual" style="display: none;">
+                    </label>
+
+                    <label class="template-card" data-template="Distrato Contratual">
+                        <i class="fas fa-trash-alt"></i>
+                        <h3>Distrato Maida</h3>
+                        <p>Para formalizar o encerramento da relação contratual.</p>
+                        <input type="radio" name="template-name" value="Distrato Contratual" style="display: none;">
+                    </label>
+
+                </div>
+            </section>
+        </div>
+        
+        <div class="grid-contrato">
+            
+            <div class="form-coluna">
+                <section class="secao-formulario">
+                    <h2>2. Preencha os Dados</h2>
+                    
+                    <form id="contrato-form" action="/gerar-documento" method="POST">
+                        <input type="hidden" name="modelo" id="modelo-selecionado" value="Contrato Prestacao Servico">
+                        <div id="campos-dinamicos">
+                            </div>
+                        
+                        <button type="submit" class="submit-button"><i class="fas fa-robot"></i> Gerar Documento Agora</button>
+                    </form>
+                </section>
+            </div>
+            
+            <div class="visualizacao-coluna">
+                <section class="visualizacao-container">
+                    <h2>3. Visualização (Tempo Real)</h2>
+                    <div id="visualizacao-texto">
+                        <p class="placeholder-visualizacao">Selecione um modelo e comece a preencher o formulário...</p>
+                    </div>
+                </section>
+            </div>
+            
+        </div>
+    </div> 
+    
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo"></div>
+            <div class="footer-links">
+                <a href="index.html">Início</a>
+                <a href="contratos.html">Contratos</a>
+                <a href="#">Sobre Nós</a>
+                <a href="#">Contato</a>
+            </div>
+            <div class="copyright">
+                &copy; 2023 Maida Health. Todos os direitos reservados.
+            </div>
+        </div>
+    </footer>
+    <script src="https://unpkg.com/imask@6.0.7/dist/imask.js"></script>
+    
+    <script src="js/contratos.js"></script>
+</body>
+</html>

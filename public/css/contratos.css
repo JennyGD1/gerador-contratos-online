@@ -1,0 +1,711 @@
+/* --- CORES MAIDA HEALTH --- */
+:root {
+    --maida-blue: #0070ff;
+    --maida-pink: #EE2C82;
+    --maida-light: #E5F0FF;
+    --maida-dark: #203d82;
+    --maida-text: #333333;
+    --maida-white: #ffffff;
+    --maida-gradient: linear-gradient(135deg, var(--maida-blue) 0%, var(--maida-dark) 100%);
+    --shadow: 0 8px 24px rgba(32, 61, 130, 0.12);
+    --shadow-light: 0 4px 12px rgba(32, 61, 130, 0.08);
+    --shadow-hover: 0 12px 32px rgba(32, 61, 130, 0.2);
+}
+
+/* --- RESET & ESTRUTURA GLOBAL --- */
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    font-family: 'Poppins', sans-serif;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    background-color: var(--maida-light);
+    color: var(--maida-text);
+    scroll-behavior: smooth;
+}
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+/* --- BARRA DE NAVEGAÇÃO (NAV) --- */
+nav {
+    width: 100%;
+    background: linear-gradient(135deg, rgba(0, 112, 255, 0.9) 0%, rgba(32, 61, 130, 0.9) 100%);
+    padding: 0 5%;
+    margin: 0;
+    box-shadow: var(--shadow);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+}
+nav ul {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    align-items: center;
+}
+nav a {
+    color: white;
+    text-decoration: none;
+    padding: 20px 25px;
+    font-size: 1.1em;
+    font-weight: 500;
+    display: block;
+    transition: all 0.3s ease;
+}
+nav a:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+.logo {
+    font-weight: 700;
+    font-size: 1.4em;
+    margin-right: auto;
+    display: flex;
+    align-items: center;
+}
+.logo i {
+    margin-right: 10px;
+    font-size: 1.2em;
+    color: var(--maida-white);
+}
+
+/* --- SEÇÃO DE CAPA (.inicio) --- */
+.inicio {
+    position: relative;
+    width: 100%;
+    height: 100px;
+    min-height: 100px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background: #ffffff;
+}
+
+.titulo-capa {
+    position: relative;
+    z-index: 6;
+    color: var(--maida-dark);
+    text-align: center;
+    padding: 0px 0px;
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    font-size: 2em;
+    font-weight: 700;
+    max-width: 600px;
+    margin: 0 20px;
+    line-height: 1.2;
+}
+
+/* --- SEÇÃO DE CONTEÚDO PRINCIPAL --- */
+.partedois {
+    display: flex;
+    flex-direction: column; /* Organiza os filhos em coluna (Seleção e Grid) */
+    align-items: center;
+    padding: 50px 20px;
+    background: var(--maida-gradient-light);
+    min-height: calc(100vh - 400px);
+}
+
+/* Contêiner de Largura Completa (para a seleção de modelos) */
+.conteudoindex {
+    background: var(--maida-white);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    max-width: 1200px; /* Aumentei o max-width para acomodar o grid de 2 colunas */
+    width: 100%;
+    text-align: left;
+    position: relative;
+    margin-bottom: 30px; /* Espaço entre a seleção de modelo e o formulário */
+}
+
+.conteudoindex::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 8px;
+    height: 100%;
+    background: var(--maida-gradient);
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+
+}
+
+/* --- GRID DE 2 COLUNAS (Formulário e Visualização) --- */
+.grid-contrato {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Duas colunas iguais */
+    gap: 30px;
+    width: 100%; /* Ocupa a largura total do .partedois */
+    max-width: 1200px; /* Mantém o alinhamento com o .conteudoindex acima */
+    margin-bottom: 50px;
+}
+
+.form-coluna {
+    order: 1; /* Formulário à esquerda em telas grandes */
+}
+.visualizacao-coluna {
+    order: 2; /* Visualização à direita em telas grandes */
+}
+
+
+/* --- ESTILIZAÇÃO DO CONTEÚDO --- */
+
+.secao-modelos h2, .secao-formulario h2 {
+    color: var(--maida-blue);
+    font-size: 1.8em;
+    margin-bottom: 25px;
+    font-weight: 700;
+    position: relative;
+    display: inline-block;
+}
+
+.secao-modelos h2::after, .secao-formulario h2::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 60px;
+    height: 4px;
+    background: var(--maida-pink);
+    border-radius: 2px;
+}
+
+/* --- GRID DE MODELOS (Seleção) --- */
+.grid-modelos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
+.template-card {
+    background: var(--maida-white);
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: var(--shadow-light);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-align: center;
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+.template-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+    border-color: var(--maida-blue);
+}
+.template-card.selected {
+    background: var(--maida-white);
+}
+
+.template-card i {
+    font-size: 2.5em;
+    color: var(--maida-blue);
+    margin-bottom: 15px;
+    display: block;
+}
+
+.template-card h3 {
+    color: var(--maida-dark);
+    font-size: 1.3em;
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+.template-card p {
+    color: var(--maida-text);
+    line-height: 1.5;
+    font-size: 0.95em;
+    margin: 0;
+}
+
+/* --- VISUALIZAÇÃO --- */
+.visualizacao-container {
+    padding: 25px;
+    background: var(--maida-white);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    position: sticky; 
+    top: 20px;
+    max-height: 80vh; 
+    overflow-y: auto; 
+    
+    min-height: 500px;
+}
+
+.visualizacao-container h2 {
+    color: var(--maida-dark);
+    font-size: 1.4em;
+    margin-top: 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+#visualizacao-texto {
+    font-size: 0.85em; /* Reduzi o tamanho para caber mais texto */
+    line-height: 1.5;
+    text-align: justify;
+    padding: 10px;
+}
+
+#visualizacao-texto p {
+    margin: 0.7em 0;
+    text-indent: 1.5em; /* Recuo para parecer mais com documento legal */
+}
+.secao-formulario {
+    background: var(--maida-white);
+    padding: 40px; 
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+    
+    min-height: auto; 
+    overflow-y: visible; 
+}
+.secao-formulario::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 8px;
+    height: 100%;
+    background: var(--maida-gradient); 
+}
+/* Destaque para os dados que estão sendo preenchidos */
+.dados-em-edicao {
+    font-weight: 700;
+    color: var(--maida-pink);
+    background-color: #ffe0ee; 
+    padding: 1px 4px;
+    border-radius: 3px;
+}
+
+.placeholder-visualizacao {
+    color: #999;
+    text-align: center !important;
+    padding-top: 100px;
+    font-style: italic;
+}
+
+/* --- ESTILO DOS INPUTS E BOTÕES --- */
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: var(--maida-dark);
+    font-size: 0.95em;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1em;
+    transition: all 0.3s ease;
+    background: #fcfcfc;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--maida-pink);
+    box-shadow: 0 0 0 3px rgba(238, 44, 130, 0.1);
+}
+.form-group-maida-data{
+
+}
+
+/* --- ESTILOS PARA SEÇÕES DO FORMULÁRIO --- */
+.form-group-section {
+    background: var(--maida-light);
+    padding: 25px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+}
+
+.section-title {
+    color: var(--maida-dark);
+    font-size: 1.2em;
+    font-weight: 600;
+    margin-top: 0;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(32, 61, 130, 0.1);
+}
+
+/* --- ESTILOS PARA CAMPOS DINÂMICOS --- */
+.item-dinamico {
+    position: relative;
+    padding: 15px;
+    background: var(--maida-white);
+    border-radius: 8px;
+    border: 1px dashed var(--maida-blue);
+    margin-bottom: 15px;
+}
+
+.item-campo {
+    position: relative;
+    padding: 15px;
+    background: var(--maida-white);
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    margin-bottom: 15px;
+}
+
+/* --- BOTÕES DE AÇÃO --- */
+.btn-adicionar-item {
+    background: var(--maida-blue);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.btn-adicionar-item:hover {
+    background: var(--maida-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-light);
+}
+
+.btn-remover-item {
+    background: var(--maida-pink);
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8em;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 10px;
+}
+
+.btn-remover-item:hover {
+    background: #d41c6d;
+    transform: translateY(-1px);
+}
+
+.remove-button {
+    background: #ff4757;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8em;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.remove-button:hover {
+    background: #ff3742;
+}
+
+/* --- BOTÃO PRINCIPAL DE SUBMIT --- */
+.submit-button {
+    width: 100%;
+    background: var(--maida-gradient);
+    color: white;
+    border: none;
+    padding: 16px 24px;
+    font-size: 1.1em;
+    font-weight: 600;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    box-shadow: var(--shadow-light);
+}
+
+.submit-button:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
+/* --- ESTILOS ESPECÍFICOS PARA CAMPOS DE CLAÚSULAS --- */
+.form-group-clausula {
+    background: var(--maida-white);
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #e0e0e0;
+}
+
+.form-group-clausula h4 {
+    color: var(--maida-dark);
+    font-size: 1.1em;
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.form-group-clausula label {
+    font-weight: 500;
+    color: var(--maida-text);
+    margin-bottom: 8px;
+    display: block;
+}
+
+.form-group-clausula input,
+.form-group-clausula textarea {
+    margin-bottom: 15px;
+}
+
+/* --- ESTILOS PARA CAMPOS DE DATA E NÚMERO --- */
+input[type="date"],
+input[type="number"] {
+    font-family: 'Poppins', sans-serif;
+}
+
+input[type="date"]:focus,
+input[type="number"]:focus {
+    border-color: var(--maida-pink);
+    box-shadow: 0 0 0 3px rgba(238, 44, 130, 0.1);
+}
+
+/* --- ESTILOS PARA SELECT PERSONALIZADO --- */
+select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23203d82' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding-right: 40px;
+}
+
+/* --- ESTILOS PARA TEXTAREA --- */
+textarea {
+    resize: vertical;
+    min-height: 80px;
+    font-family: 'Poppins', sans-serif;
+    line-height: 1.5;
+}
+
+/* --- ESTILOS PARA CAMPOS DESABILITADOS --- */
+input:disabled,
+select:disabled,
+textarea:disabled {
+    background-color: #f5f5f5;
+    color: #999;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* --- MENSAGENS DE ERRO/VALIDAÇÃO --- */
+.form-group small {
+    display: block;
+    margin-top: 5px;
+    color: #666;
+    font-size: 0.8em;
+    line-height: 1.4;
+}
+
+.form-group .error-message {
+    color: #ff4757;
+    font-size: 0.8em;
+    margin-top: 5px;
+    display: none;
+}
+
+.form-group.error input,
+.form-group.error select,
+.form-group.error textarea {
+    border-color: #ff4757;
+    box-shadow: 0 0 0 3px rgba(255, 71, 87, 0.1);
+}
+
+.form-group.error .error-message {
+    display: block;
+}
+
+/* --- RODAPÉ E RESPONSIVIDADE --- */
+footer {
+    background: var(--maida-dark);
+    color: white;
+    padding: 40px 5%;
+    text-align: center;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin: 20px 0;
+}
+
+.footer-links a {
+    color: white;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.footer-links a:hover {
+    color: var(--maida-pink);
+}
+
+.copyright {
+    margin-top: 30px;
+    font-size: 0.9em;
+    opacity: 0.8;
+}
+
+/* --- RESPONSIVIDADE --- */
+@media (max-width: 1024px) {
+    .grid-contrato {
+        grid-template-columns: 1fr;
+        padding: 0 25px;
+    }
+    .visualizacao-container {
+        position: static;
+        max-height: none;
+    }
+    
+    .grid-modelos {
+        grid-template-columns: 1fr;
+    }
+    
+    .conteudoindex {
+        padding: 25px;
+    }
+    
+    .secao-formulario {
+        padding: 25px;
+    }
+}
+
+@media (max-width: 768px) {
+    nav ul {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    nav a {
+        padding: 15px 20px;
+        width: 100%;
+    }
+    
+    .logo {
+        margin-right: 0;
+        padding: 15px 20px;
+    }
+    
+    .form-group-section {
+        padding: 15px;
+    }
+    
+    .footer-links {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .titulo-capa {
+        font-size: 1.5em;
+    }
+}
+
+@media (max-width: 480px) {
+    .partedois {
+        padding: 30px 15px;
+    }
+    
+    .conteudoindex {
+        padding: 20px;
+    }
+    
+    .secao-formulario {
+        padding: 20px;
+    }
+    
+    .template-card {
+        padding: 20px;
+    }
+    
+    .submit-button {
+        padding: 14px 20px;
+        font-size: 1em;
+    }
+}
+
+/* --- ANIMAÇÕES --- */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.form-group-section,
+.template-card,
+.visualizacao-container {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* --- SCROLLBAR GLOBAL --- */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--maida-blue);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--maida-dark);
+}
+
+/* Para Firefox */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--maida-blue) #f1f1f1;
+}

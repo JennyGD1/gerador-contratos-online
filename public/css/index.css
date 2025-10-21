@@ -1,0 +1,398 @@
+
+        /* --- CORES MAIDA HEALTH --- */
+        :root {
+            --maida-blue: #0070ff;
+            --maida-pink: #EE2C82;
+            --maida-light: #E5F0FF;
+            --maida-dark: #203d82;
+            --maida-text: #333333;
+            --maida-white: #ffffff;
+            --maida-gradient: linear-gradient(135deg, var(--maida-blue) 0%, var(--maida-dark) 100%);
+            --maida-gradient-light: linear-gradient(135deg, var(--maida-light) 0%, #f5f9ff 100%);
+            --shadow: 0 8px 24px rgba(32, 61, 130, 0.12);
+            --shadow-light: 0 4px 12px rgba(32, 61, 130, 0.08);
+        }
+
+        /* --- RESET & ESTRUTURA GLOBAL --- */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: 'Poppins', sans-serif;
+            box-sizing: border-box;
+            overflow-x: hidden;
+            background-color: var(--maida-light);
+            color: var(--maida-text);
+            scroll-behavior: smooth;
+        }
+        *, *:before, *:after {
+            box-sizing: inherit;
+        }
+
+        /* --- BARRA DE NAVEGAÇÃO (NAV) --- */
+        nav {
+            width: 100%;
+            background: linear-gradient(135deg, rgba(0, 112, 255, 0.9) 0%, rgba(32, 61, 130, 0.7) 100%);
+            padding: 0 5%;
+            margin: 0;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px); /* Adiciona efeito de desfoque no conteúdo behind */
+        }
+        nav ul {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            align-items: center;
+        }
+        nav li {
+            position: relative;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 20px 25px;
+            font-size: 1.1em;
+            font-weight: 500;
+            display: block;
+            transition: all 0.3s ease;
+        }
+        nav a:hover {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 25px;
+            right: 25px;
+            height: 3px;
+            background-color: var(--maida-pink);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        nav a:hover::after {
+            transform: scaleX(1);
+        }
+        .logo {
+            font-weight: 700;
+            font-size: 1.4em;
+            margin-right: auto;
+            display: flex;
+            align-items: center;
+        }
+        .logo i {
+            margin-right: 10px;
+            font-size: 1.2em;
+            color: var(--maida-white)
+        }
+
+        /* --- SEÇÃO DE CAPA (.inicio) --- */
+        .inicio {
+            position: relative;
+            width: 100%;
+            height: 1vh;
+            min-height: 500px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: var(--maida-gradient);
+        }
+
+        /* --- IMAGEM DE FUNDO (Capa) --- */
+        .reuniaoimagem {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            opacity: 0.25;
+            z-index: 1;
+        }
+
+        /* --- CÍRCULO DECORATIVO --- */
+        .circulo {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background-image: url('../img/circulo.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 2;
+            pointer-events: none;
+            animation: rotate 20s linear infinite;
+            opacity: 0.7;
+        }
+
+        .circulo-top-right {
+            top: -100px;
+            right: -100px;
+            width: 400px;
+            height: 400px;
+        }
+
+        .circulo-bottom-left {
+            bottom: -100px;
+            left: -100px;
+            width: 350px;
+            height: 350px;
+        }
+
+        /* --- TÍTULO SOBREPOSTO --- */
+        .titulo-capa {
+            position: relative;
+            z-index: 6;
+            color: white;
+            text-align: center;
+            padding: 30px 40px;
+            background-color: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 2.8em;
+            font-weight: 700;
+            max-width: 800px;
+            margin: 0 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            line-height: 1.2;
+        }
+
+        /* --- SEÇÃO DE CONTEÚDO (Parte Dois) --- */
+        .partedois {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 80px 20px;
+            background: var(--maida-gradient-light);
+        }
+
+        .conteudoindex {
+            background: var(--maida-white);
+            padding: 50px 40px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            max-width: 800px;
+            width: 100%;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .conteudoindex::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 8px;
+            height: 100%;
+            background: var(--maida-gradient);
+        }
+        
+        .conteudoindex h2 {
+            color: var(--maida-blue);
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            font-weight: 700;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .conteudoindex h2::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: var(--maida-pink);
+            border-radius: 2px;
+        }
+        
+        .conteudoindex p {
+            color: var(--maida-text);
+            line-height: 1.8;
+            font-size: 1.2em;
+            margin-bottom: 30px;
+        }
+        
+        .destaque {
+            display: flex;
+            align-items: center;
+            background: var(--maida-light);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 30px;
+            border-left: 4px solid var(--maida-pink);
+        }
+        
+        .destaque i {
+            color: var(--maida-pink);
+            font-size: 2em;
+            margin-right: 20px;
+        }
+        
+        .destaque p {
+            margin: 0;
+            font-weight: 500;
+        }
+
+        /* --- SEÇÃO DE RECURSOS --- */
+        .recursos {
+            padding: 80px 5%;
+            background: var(--maida-white);
+        }
+        
+        .recursos h2 {
+            text-align: center;
+            color: var(--maida-dark);
+            font-size: 2.5em;
+            margin-bottom: 60px;
+            font-weight: 700;
+        }
+        
+        .grid-recursos {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .card-recurso {
+            background: var(--maida-white);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: var(--shadow-light);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-align: center;
+        }
+        
+        .card-recurso:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow);
+        }
+        
+        .card-recurso i {
+            font-size: 3em;
+            color: var(--maida-blue);
+            margin-bottom: 20px;
+        }
+        
+        .card-recurso h3 {
+            color: var(--maida-dark);
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+        
+        .card-recurso p {
+            color: var(--maida-text);
+            line-height: 1.6;
+        }
+
+        /* --- RODAPÉ --- */
+        footer {
+            background: var(--maida-dark);
+            color: white;
+            padding: 40px 5%;
+            text-align: center;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .footer-logo {
+            background-image: url('../img/logomaidabranco.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            width: 200px; 
+            height: 120px; 
+            margin: 0 auto; 
+            display: block;
+        }
+
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 20px 0;
+        }
+        
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: var(--maida-pink);
+        }
+        
+        .copyright {
+            margin-top: 30px;
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        /* --- KEYFRAMES --- */
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* --- RESPONSIVIDADE --- */
+        @media (max-width: 768px) {
+            nav ul {
+                flex-direction: column;
+                padding: 10px 0;
+            }
+            
+            nav a {
+                padding: 15px 20px;
+                width: 100%;
+                text-align: center;
+            }
+            
+            .logo {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+            
+            .titulo-capa {
+                font-size: 2em;
+                padding: 20px;
+            }
+            
+            .conteudoindex {
+                padding: 30px 25px;
+            }
+            
+            .conteudoindex h2 {
+                font-size: 2em;
+            }
+            
+            .grid-recursos {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-links {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
