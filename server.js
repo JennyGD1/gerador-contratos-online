@@ -52,7 +52,7 @@ async function ensureAuth() {
 // --- DADOS SENSÍVEIS ---
 const HASH_DA_SENHA_SECRETA = process.env.HASH_DA_SENHA_SECRETA;
 const USUARIO_PADRAO = process.env.USUARIO_PADRAO;
-const SESSION_SECRET = process.env.SESSION_SECRET;
+const SESSION_SECRET = process.env.SESSION_SECRET || 'chave-muito-secreta';
 
 // --- MAPEAMENTO DE IDs DOS TEMPLATES ---
 const TEMPLATE_IDS = {
@@ -613,16 +613,17 @@ app.get('/oauth2callback', async (req, res) => {
     try {
         const { tokens } = await oauth2Client.getToken(code);
         
-        // SALVA O REFRESH TOKEN (em produção, use um banco de dados)
+        // SALVA O REFRESH TOKEN 
         if (tokens.refresh_token) {
             console.log('✅ Refresh token obtido com sucesso!');
+            console.log('*** NOVO REFRESH TOKEN (COPIAR E ADICIONAR AO RENDER):', tokens.refresh_token, '***');
             // Em produção real, salve em um banco de dados
             process.env.GOOGLE_REFRESH_TOKEN = tokens.refresh_token;
         }
         
         oauth2Client.setCredentials(tokens);
         
-        res.redirect('/');
+        res.send('Autenticação Google concluída com sucesso! Você pode fechar esta página e voltar ao app.');
         
     } catch (error) {
         console.error('Erro na autenticação:', error);
@@ -658,7 +659,14 @@ app.post('/login', async (req, res) => {
                 isAuthenticated: req.session.isAuthenticated
             });
             req.session.isAuthenticated = true;
-            res.redirect('/'); 
+
+            req.session.save((err) => {
+                if (err) {
+                    console.error('ERRO AO SALVAR SESSÃO:', err);
+                    return res.status(500).send("Erro ao salvar a sessão.");
+                }
+                res.redirect('/'); 
+            });
         } else {
             console.log('❌ SENHA INVÁLIDA');
             res.send('Falha no Login: Usuário ou Senha inválidos.');
