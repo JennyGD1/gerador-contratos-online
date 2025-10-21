@@ -500,10 +500,18 @@ app.use(session({
 }));
 
 function isLogged(req, res, next) {
-    if (req.session && req.session.isAuthenticated) {
+    console.log('🔐 VERIFICAÇÃO DE SESSÃO:', {
+        hasSession: !!req.session,
+        isAuthenticated: req.session.isAuthenticated,
+        sessionKeys: Object.keys(req.session),
+        path: req.path
+    });
+    if (req.session && req.session.isAuthenticated === true) {
+        console.log('✅ USUÁRIO AUTENTICADO - Permitindo acesso');
         return next();
     } else {
-        res.redirect('/login');
+        console.log('🛑 USUÁRIO NÃO AUTENTICADO - Redirecionando para /login');
+        return res.redirect('/login');
     }
 }
 
@@ -633,20 +641,29 @@ app.get('/login', (req, res) => {
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
+    console.log('🔐 TENTATIVA DE LOGIN:', { username, hasPassword: !!password });
+
     if (username !== USUARIO_PADRAO) {
+        console.log('❌ USUÁRIO INVÁLIDO');
         return res.send('Falha no Login: Usuário ou Senha inválidos.'); 
     }
 
     try {
         const isMatch = await bcrypt.compare(password, HASH_DA_SENHA_SECRETA);
+        console.log('🔐 COMPARAÇÃO DE SENHA:', { isMatch });
         if (isMatch) {
+            console.log('✅ LOGIN BEM-SUCEDIDO - Sessão:', {
+                sessionId: req.sessionID,
+                isAuthenticated: req.session.isAuthenticated
+            });
             req.session.isAuthenticated = true;
             res.redirect('/'); 
         } else {
+            console.log('❌ SENHA INVÁLIDA');
             res.send('Falha no Login: Usuário ou Senha inválidos.');
         }
     } catch (error) {
-        console.error("Erro na comparação do hash:", error);
+        console.error("❌ ERRO NO LOGIN:", error);
         res.status(500).send("Erro interno no servidor.");
     }
 });
