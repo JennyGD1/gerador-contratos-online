@@ -6,6 +6,8 @@ const session = require('express-session');
 const bcrypt = require('bcrypt');
 const path = require('path');
 const { google } = require('googleapis');
+const RedisStore = require('connect-redis').default;
+const redis = require('redis');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -490,15 +492,29 @@ async function checkDriveQuota() {
 // --- MIDDLEWARES ---
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
-app.set('trust proxy', 1);
+
+const redisClient = redis.createClient({
+    url: process.env.REDIS_URL || 'redis://localhost:6379'
+});
+redisClient.connect().catch(console.error);
 
 app.use(session({
+    store: new RedisStore({ client: redisClient }),
     secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 1000 * 60 * 60 * 24, secure: 'auto' }
+    cookie: { maxAge: 1000 * 60 * 60 * 24, secure: process.env.NODE_ENV === 'production' }
 }));
+
+app.use('/static', express.static(path.join(__dirname, 'public'), {
+    setHeaders: (res, path) => {
+        if (path.endsWith('login.html') || path.match(/\.(css|js|png|jpg|jpeg|gif|ico)$/)) {
+            return;
+        }
+        res.redirect('/login');
+    }
+}));
+app.set('trust proxy', 1);
 
 function isLogged(req, res, next) {
     console.log('🔐 VERIFICAÇÃO DE SESSÃO:', {
