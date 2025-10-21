@@ -687,3 +687,10 @@ app.listen(PORT, async () => {
         console.log('⚠️  Acesse http://localhost:3000/auth para configurar OAuth2');
     }
 });
+app.get('/debug-auth', (req, res) => {
+    res.json({
+        isAuthenticated: req.session.isAuthenticated,
+        sessionId: req.sessionID,
+        session: req.session
+    });
+});
