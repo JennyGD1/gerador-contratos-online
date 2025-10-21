@@ -1,6 +1,0 @@
-# Exclui variáveis de ambiente e módulos Node.js
-.env
-/node_modules
-generate_new_hash.js
-hash_test.js
-google-credentials.json
