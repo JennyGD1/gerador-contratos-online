@@ -448,14 +448,7 @@ app.use(session({
 }));
 
 // Middleware para arquivos estáticos
-app.use(express.static(path.join(__dirname, 'public'), {
-    setHeaders: (res, path) => {
-        if (path.endsWith('login.html') || path.match(/\.(css|js|png|jpg|jpeg|gif|ico)$/)) {
-            return;
-        }
-        res.redirect('/login');
-    }
-}));
+app.use(express.static(path.join(__dirname, 'public')));
 app.set('trust proxy', 1);
 
 // Middleware de autenticação (usuário/senha)
