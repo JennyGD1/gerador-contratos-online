@@ -204,7 +204,7 @@ function getMaidaData(cnpj, body) {
 
 function getContratadoDados(body) {
     const nome = body['razao-social-contratado'] || '{{CONTRATADO RAZÃO SOCIAL}}';
-    const cnpj_cpf = body['cnpj-contratado'] || '{{CNPJ/CPF DO CONTRATADO}}';
+    const cnpj_cpf = body['cnpj-contratado'] || '{{CNPJ DO CONTRATADO}}';
     const endereco = body['endereco-contratado'] || '{{ENDEREÇO COMPLETO DO CONTRATADO}}';
     const representante = body['representante-contratado'] || '{{NOME DO REPRESENTANTE}}';
     const cpf_rep = body['cpf-representante-contratado'] || '{{CPF DO REPRESENTANTE}}';
