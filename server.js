@@ -329,7 +329,7 @@ function buildSubstitutionsMap(formData, templateName) {
             'LOCAL_DISTRATO': formData['local-distrato'] || '',
         };
     }
-    return { ...commonFields, ...specificFields };
+    return { ...commonFields, ...specificFields, ...rodapeFields };
 }
 
 function createCleanupRequests(placeholdersToCleanup) {
