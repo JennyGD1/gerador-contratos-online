@@ -1,18 +1,21 @@
-// server.js
 require('dotenv').config();
-
+console.log('Variáveis de ambiente:', {
+    clientId: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    redirectUri: process.env.GOOGLE_REDIRECT_URI
+});
 const express = require('express');
 const session = require('express-session');
 const bcrypt = require('bcrypt');
 const path = require('path');
 const { google } = require('googleapis');
-const RedisStore = require('connect-redis').default;
-const redis = require('redis');
+const { RedisStore } = require('connect-redis'); // Importação correta para v9.x
+const redis = require('redis'); // Adicionada importação do redis
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// --- CONFIGURAÇÃO DO OAUTH2  ---
+// --- CONFIGURAÇÃO DO OAUTH2 ---
 const oauth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
     process.env.GOOGLE_CLIENT_SECRET,
@@ -30,16 +33,14 @@ if (process.env.GOOGLE_REFRESH_TOKEN) {
 const drive = google.drive({ version: 'v3', auth: oauth2Client });
 const docs = google.docs({ version: 'v1', auth: oauth2Client });
 
-// Função para garantir autenticação
+// Função para garantir autenticação OAuth (usada apenas em rotas específicas)
 async function ensureAuth() {
     try {
-        // Se já temos refresh token, usa ele
         if (process.env.GOOGLE_REFRESH_TOKEN) {
             oauth2Client.setCredentials({
                 refresh_token: process.env.GOOGLE_REFRESH_TOKEN
             });
         }
-        
         const token = await oauth2Client.getAccessToken();
         if (!token) {
             throw new Error('Não autenticado');
@@ -63,7 +64,7 @@ const TEMPLATE_IDS = {
     'Distrato Contratual': '1_2fOSv1bFwcWpGgGyB8PV8OgjNWxYmEBKHPkZlU-doA'
 };
 
-// --- DADOS FIXOS DA MAIDA CNPJS (mantido igual) ---
+// --- DADOS FIXOS DA MAIDA CNPJS ---
 const MAIDA_CNPJS = [
     { 
         cnpj: '01.239.608/0001-36', 
@@ -167,7 +168,6 @@ function formatDateBR(dateString) {
 
 function getMaidaData(cnpj, body) {
     const data = MAIDA_CNPJS.find(item => item.cnpj === cnpj);
-    
     if (!data) {
         console.error(`ERRO: CNPJ da Maida ${cnpj} não encontrado na lista MAIDA_CNPJS.`);
         return { 
@@ -178,16 +178,13 @@ function getMaidaData(cnpj, body) {
             RODAPE_CONTRATANTE: 'Dados da Contratante não encontrados.' 
         };
     }
-
     const repData = {
         nome: body['rep-maida-nome'] || 'J. R. Alves',
         cpf: body['rep-maida-cpf'] || '056.288.538-28',
         cargo: body['rep-maida-cargo'] || 'Diretor Financeiro',
     };
-    
     const nome_completo = data.nome;
     const endereco_formatado = data.endereco.replace(/\s-\s/, ', ').replace(/,$/, ''); 
-    
     const rodape_contratante = 
         `${nome_completo}\n` +
         `CNPJ nº ${data.cnpj}\n` +
@@ -204,6 +201,7 @@ function getMaidaData(cnpj, body) {
         assinatura: assinatura_contratante
     };
 }
+
 function getContratadoDados(body) {
     const nome = body['razao-social-contratado'] || '{{CONTRATADO RAZÃO SOCIAL}}';
     const cnpj_cpf = body['cnpj-contratado'] || '{{CNPJ/CPF DO CONTRATADO}}';
@@ -211,11 +209,9 @@ function getContratadoDados(body) {
     const representante = body['representante-contratado'] || '{{NOME DO REPRESENTANTE}}';
     const cpf_rep = body['cpf-representante-contratado'] || '{{CPF DO REPRESENTANTE}}';
     const cargo_rep = body['cargo-representante-contratado'] || '{{CARGO}}';
-
     const assinatura_contratada = 
         `${nome}\n` +
         `${representante}`;
-
     return {
         nome_completo: nome,
         nome: nome,
@@ -225,18 +221,14 @@ function getContratadoDados(body) {
     };
 }
 
-
 function buildSubstitutionsMap(formData, templateName) {
     const maida = getMaidaData(formData['cnpj-maida'], formData); 
     const contratado = getContratadoDados(formData);
-
     const rodapeLines = maida.RODAPE_CONTRATANTE ? maida.RODAPE_CONTRATANTE.split('\n') : [];
     const rodapeFields = {};
-    
     rodapeLines.forEach((line, index) => {
         rodapeFields[`RODAPE_LINHA_${index + 1}`] = line;
     });
-    
     const commonFields = {
         'CONTRATANTE_NOME': maida.nome_completo,
         'CONTRATADO_RAZAO': contratado.nome,
@@ -245,44 +237,24 @@ function buildSubstitutionsMap(formData, templateName) {
         'ASSINATURA_CONTRATANTE': maida.assinatura,
         'ASSINATURA_CONTRATADA': contratado.assinatura,
     };
-    
-    // Adicionar linhas do rodapé se existirem
-    if (maida.RODAPE_CONTRATANTE) {
-        const rodapeLines = maida.RODAPE_CONTRATANTE.split('\n');
-        rodapeLines.forEach((line, index) => {
-            commonFields[`RODAPE_LINHA_${index + 1}`] = line;
-        });
-    }
-    
     let specificFields = {};
-
     if (templateName === 'Contrato Prestacao Servico') {
-    // Processar itens dinâmicos do objeto
-    const itensArray = [];
-    
-    if (formData['itens-objeto']) {
-        const itensDinamicos = Array.isArray(formData['itens-objeto']) 
-            ? formData['itens-objeto'] 
-            : [formData['itens-objeto']];
-        
-        console.log('🔍 DEBUG - Itens recebidos:', itensDinamicos); 
-        
-        // Processar TODOS os itens do array
-        itensDinamicos.forEach((texto, index) => {
-            if (texto && texto.trim()) {
-                const letra = String.fromCharCode(97 + index); // a, b, c...
-                itensArray.push({ letra, texto });
-                console.log(`✅ Item ${letra}: ${texto.substring(0, 50)}...`); // Debug
-            }
-        });
-    }
-        
-        // Criar texto formatado para todos os itens
+        const itensArray = [];
+        if (formData['itens-objeto']) {
+            const itensDinamicos = Array.isArray(formData['itens-objeto']) 
+                ? formData['itens-objeto'] 
+                : [formData['itens-objeto']];
+            itensDinamicos.forEach((texto, index) => {
+                if (texto && texto.trim()) {
+                    const letra = String.fromCharCode(97 + index);
+                    itensArray.push({ letra, texto });
+                }
+            });
+        }
         let textoItens = '';
         itensArray.forEach(item => {
             textoItens += `${item.letra}. ${item.texto}\n`;
         });
-        
         specificFields = {
             'SERVICO_PRESTADO': formData['servico-prestado'] || '',
             'ITENS_OBJETO_COMPLETO': textoItens, 
@@ -294,81 +266,60 @@ function buildSubstitutionsMap(formData, templateName) {
             'CONTRATADO_PIX': formData['chave-pix'] || '',
             'LOCAL_DATA': formData['local-data-contrato'] || '',
         };
-} else if (templateName === 'Aditivo Contratual') {
-    
-    // --- 1. PROCESSAMENTO DOS CONSIDERANDOS ADICIONAIS ---
-    const considerandosArray = Array.isArray(formData['considerandos-adicionais']) 
-        ? formData['considerandos-adicionais'] 
-        : [formData['considerandos-adicionais']];
-    
-    let textoConsiderandos = '';
-    const itensValidosConsiderandos = considerandosArray.filter(item => item && item.trim());
-    itensValidosConsiderandos.forEach((texto, index) => {
-        const letra = String.fromCharCode(99 + index); 
-        textoConsiderandos += `${letra}). ${texto.trim()} \r`; 
-    });
-    
-    if (textoConsiderandos.length > 0) {
-        textoConsiderandos = textoConsiderandos.trim();
-    }
-
-    // --- 2. DEFINIÇÃO DAS CLÁUSULAS DINÂMICAS (1, 2, 3) ---
-    // A única lista de cláusulas que importa é a que vem do formulário
-    const dynamicClausulas = [
-        { nome: 'PRIMEIRA', objetivo: formData['clausula-primeira-objetivo'], alteracao: formData['clausula-primeira-alteracao'] },
-        { nome: 'SEGUNDA', objetivo: formData['clausula-segunda-objetivo'], alteracao: formData['clausula-segunda-alteracao'] },
-        { nome: 'TERCEIRA', objetivo: formData['clausula-terceira-objetivo'], alteracao: formData['clausula-terceira-alteracao'] },
-    ];
-    
-    let clausulasSubstituicoes = {};
-
-    // --- 3. MONTAGEM DOS PLACEHOLDERS CONDICIONAIS (NÃO HÁ RENUMERAÇÃO DE BLOCOS FIXOS!) ---
-    
-    dynamicClausulas.forEach((clausula) => {
-        const placeholderKey = `CLAUSULA_${clausula.nome}_COMPLETA`;
-        const objetivo = clausula.objetivo?.trim();
-        const alteracao = clausula.alteracao?.trim();
-        
-        let conteudoClausula = '';
-
-        const isOpcional = clausula.nome !== 'PRIMEIRA';
-        const isPreenchida = objetivo && alteracao;
-
-        if (isOpcional && !isPreenchida) {
-            conteudoClausula = ''; 
-        } else {
-            const obj = objetivo || '[INDICAR QUAL O OBJETIVO DO ADITIVO]';
-            const alt = alteracao || '[informar a alteração]';
-            
-            conteudoClausula = `CLÁUSULA ${clausula.nome} - ${obj}: As Partes decidem, em comum acordo, ${alt}`;
-            conteudoClausula += '\n\n'; 
+    } else if (templateName === 'Aditivo Contratual') {
+        const considerandosArray = Array.isArray(formData['considerandos-adicionais']) 
+            ? formData['considerandos-adicionais'] 
+            : [formData['considerandos-adicionais']];
+        let textoConsiderandos = '';
+        const itensValidosConsiderandos = considerandosArray.filter(item => item && item.trim());
+        itensValidosConsiderandos.forEach((texto, index) => {
+            const letra = String.fromCharCode(99 + index); 
+            textoConsiderandos += `${letra}). ${texto.trim()} \r`; 
+        });
+        if (textoConsiderandos.length > 0) {
+            textoConsiderandos = textoConsiderandos.trim();
         }
-        
-        clausulasSubstituicoes[placeholderKey] = conteudoClausula;
-    });
-    
-    const placeholdersParaLimpar = ['CLAUSULA_SEGUNDA_COMPLETA', 'CLAUSULA_TERCEIRA_COMPLETA'];
-    
-    placeholdersParaLimpar.forEach(key => {
-        if (!clausulasSubstituicoes[key]) {
-             clausulasSubstituicoes[key] = '';
-        }
-    });
-    
-    specificFields = {
-        'NUMERO_ADITIVO': formData['numero_aditivo'] || '',
-        'INDICAR_O_CONTRATO': formData['indicar_o_contrato'] || '',
-        'DATA_ASSINATURA_ORIGINAL': formatDateBR(formData['data-assinatura-original']),
-        'CONTRATO_ORIGINAL': formData['contrato-original'] || '',
-        'INTUITO_ADITIVO': formData['intuito-aditivo'] || '',
-        'LOCAL_DATA_ADITIVO': formData['local-data-aditivo'] || '',
-        'CLAUSULA_PRIMEIRA_OBJETIVO': formData['clausula-primeira-objetivo'] || '',
-        'CLAUSULA_PRIMEIRA_ALTERACAO': formData['clausula-primeira-alteracao'] || '',
-        
-        'CONSIDERANDOS_ADICIONAIS': textoConsiderandos, 
-        
-        ...clausulasSubstituicoes 
-    };
+        const dynamicClausulas = [
+            { nome: 'PRIMEIRA', objetivo: formData['clausula-primeira-objetivo'], alteracao: formData['clausula-primeira-alteracao'] },
+            { nome: 'SEGUNDA', objetivo: formData['clausula-segunda-objetivo'], alteracao: formData['clausula-segunda-alteracao'] },
+            { nome: 'TERCEIRA', objetivo: formData['clausula-terceira-objetivo'], alteracao: formData['clausula-terceira-alteracao'] },
+        ];
+        let clausulasSubstituicoes = {};
+        dynamicClausulas.forEach((clausula) => {
+            const placeholderKey = `CLAUSULA_${clausula.nome}_COMPLETA`;
+            const objetivo = clausula.objetivo?.trim();
+            const alteracao = clausula.alteracao?.trim();
+            let conteudoClausula = '';
+            const isOpcional = clausula.nome !== 'PRIMEIRA';
+            const isPreenchida = objetivo && alteracao;
+            if (isOpcional && !isPreenchida) {
+                conteudoClausula = ''; 
+            } else {
+                const obj = objetivo || '[INDICAR QUAL O OBJETIVO DO ADITIVO]';
+                const alt = alteracao || '[informar a alteração]';
+                conteudoClausula = `CLÁUSULA ${clausula.nome} - ${obj}: As Partes decidem, em comum acordo, ${alt}`;
+                conteudoClausula += '\n\n'; 
+            }
+            clausulasSubstituicoes[placeholderKey] = conteudoClausula;
+        });
+        const placeholdersParaLimpar = ['CLAUSULA_SEGUNDA_COMPLETA', 'CLAUSULA_TERCEIRA_COMPLETA'];
+        placeholdersParaLimpar.forEach(key => {
+            if (!clausulasSubstituicoes[key]) {
+                clausulasSubstituicoes[key] = '';
+            }
+        });
+        specificFields = {
+            'NUMERO_ADITIVO': formData['numero_aditivo'] || '',
+            'INDICAR_O_CONTRATO': formData['indicar_o_contrato'] || '',
+            'DATA_ASSINATURA_ORIGINAL': formatDateBR(formData['data-assinatura-original']),
+            'CONTRATO_ORIGINAL': formData['contrato-original'] || '',
+            'INTUITO_ADITIVO': formData['intuito-aditivo'] || '',
+            'LOCAL_DATA_ADITIVO': formData['local-data-aditivo'] || '',
+            'CLAUSULA_PRIMEIRA_OBJETIVO': formData['clausula-primeira-objetivo'] || '',
+            'CLAUSULA_PRIMEIRA_ALTERACAO': formData['clausula-primeira-alteracao'] || '',
+            'CONSIDERANDOS_ADICIONAIS': textoConsiderandos, 
+            ...clausulasSubstituicoes 
+        };
     } else if (templateName === 'Distrato Contratual') {
         specificFields = {
             'CONTRATO_DISTRATO': formData['contrato-distrato'] || '',
@@ -378,40 +329,34 @@ function buildSubstitutionsMap(formData, templateName) {
             'LOCAL_DISTRATO': formData['local-distrato'] || '',
         };
     }
-
     return { ...commonFields, ...specificFields };
 }
+
 function createCleanupRequests(placeholdersToCleanup) {
     const cleanupRequests = [];
-    
-    // Expressões regulares para placeholders não substituídos (ex: {{NOME_DO_CAMPO}})
     const regex = /\{\{[A-Z0-9_]+\}\}/g;
-
-    // Garante que o Aditivo limpe seus próprios placeholders não utilizados (1ª, 2ª, 3ª)
     placeholdersToCleanup.forEach(placeholder => {
         cleanupRequests.push({
             replaceAllText: {
                 containsText: {
-                    text: placeholder, // Ex: {{CLAUSULA_TERCEIRA_COMPLETA}}
+                    text: placeholder,
                     matchCase: true,
                 },
-                replaceText: '', // Substitui por vazio para remover do documento
+                replaceText: '',
             }
         });
     });
     return cleanupRequests;
 }
+
 function createSubstitutionRequests(substitutionsMap) {
     const requests = [];
-    
     for (const tag in substitutionsMap) {
         let value = substitutionsMap[tag] || '';
         const placeholder = `{{${tag.toUpperCase()}}}`;
-        
         if (tag === 'RODAPE_CONTRATANTE') {
             continue;
         }
-        
         if (tag === 'ITENS_OBJETO_COMPLETO') {
             requests.push({
                 replaceAllText: {
@@ -446,16 +391,13 @@ function createSubstitutionRequests(substitutionsMap) {
             });
         }
     }
-    
     return requests;
 }
+
 function createRodapeRequests(rodapeText) {
     if (!rodapeText) return [];
-    
     const requests = [];
     const lines = rodapeText.split('\n');
-    
-    // Substitui cada linha individualmente
     lines.forEach((line, index) => {
         requests.push({
             replaceAllText: {
@@ -467,23 +409,18 @@ function createRodapeRequests(rodapeText) {
             },
         });
     });
-    
     return requests;
 }
 
-// Função para verificar quota
 async function checkDriveQuota() {
     try {
         await ensureAuth();
         const about = await drive.about.get({ fields: 'storageQuota' });
         console.log('Status do storage:', about.data.storageQuota);
-        
         const used = parseInt(about.data.storageQuota.usage || '0');
         const total = parseInt(about.data.storageQuota.limit || '1');
         const percent = total > 0 ? ((used / total) * 100).toFixed(2) : '0';
-        
         console.log(`Storage usado: ${used} bytes de ${total} bytes (${percent}%)`);
-        
     } catch (error) {
         console.error('Erro ao verificar quota:', error.message);
     }
@@ -493,11 +430,13 @@ async function checkDriveQuota() {
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+// Configurar Redis
 const redisClient = redis.createClient({
     url: process.env.REDIS_URL || 'redis://localhost:6379'
 });
 redisClient.connect().catch(console.error);
 
+// Configurar sessão com Redis
 app.use(session({
     store: new RedisStore({ client: redisClient }),
     secret: SESSION_SECRET,
@@ -506,6 +445,7 @@ app.use(session({
     cookie: { maxAge: 1000 * 60 * 60 * 24, secure: process.env.NODE_ENV === 'production' }
 }));
 
+// Middleware para arquivos estáticos
 app.use('/static', express.static(path.join(__dirname, 'public'), {
     setHeaders: (res, path) => {
         if (path.endsWith('login.html') || path.match(/\.(css|js|png|jpg|jpeg|gif|ico)$/)) {
@@ -516,6 +456,7 @@ app.use('/static', express.static(path.join(__dirname, 'public'), {
 }));
 app.set('trust proxy', 1);
 
+// Middleware de autenticação (usuário/senha)
 function isLogged(req, res, next) {
     console.log('🔐 VERIFICAÇÃO DE SESSÃO:', {
         hasSession: !!req.session,
@@ -535,20 +476,15 @@ function isLogged(req, res, next) {
 // --- ROTAS PRINCIPAIS ---
 app.post('/gerar-documento', isLogged, async (req, res) => {
     let newDocId = null; 
-    
     try {
-        await ensureAuth();
-        
+        await ensureAuth(); // OAuth necessário apenas para geração de documentos
         const { modelo: templateName } = req.body; 
         const formData = req.body;
         const templateId = TEMPLATE_IDS[templateName];
-
         if (!templateId) {
             return res.status(400).send('Modelo de documento não encontrado.');
         }
-        
         const substitutions = buildSubstitutionsMap(formData, templateName);
-
         console.log(`DEBUG: Copiando template ${templateId} para processamento...`);
         const copyResponse = await drive.files.copy({
             fileId: templateId,
@@ -558,8 +494,6 @@ app.post('/gerar-documento', isLogged, async (req, res) => {
         });
         newDocId = copyResponse.data.id;
         console.log(`✅ Cópia criada com sucesso. ID: ${newDocId}`);
-
-        // Aplicar substituições
         const requests = createSubstitutionRequests(substitutions);
         await docs.documents.batchUpdate({
             documentId: newDocId, 
@@ -578,25 +512,20 @@ app.post('/gerar-documento', isLogged, async (req, res) => {
             });
             console.log('✅ Limpeza final de placeholders não utilizados aplicada.');
         }
-        // Exportar PDF
         const pdfResponse = await drive.files.export({
             fileId: newDocId, 
             mimeType: 'application/pdf',
         }, { responseType: 'arraybuffer' });
-
         const pdfBuffer = Buffer.from(pdfResponse.data);
-        
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', `attachment; filename="${copyResponse.data.name}.pdf"`);
         res.send(pdfBuffer);
-
     } catch (error) {
         console.error('Erro na geração do documento:', error);
         if (!res.headersSent) {
             res.status(500).send('Erro ao processar o documento: ' + error.message);
         }
     } finally {
-        // Limpeza
         if (newDocId) {
             try {
                 console.log(`🔄 Excluindo arquivo temporário ${newDocId}...`);
@@ -604,7 +533,6 @@ app.post('/gerar-documento', isLogged, async (req, res) => {
                 console.log(`✅ Arquivo temporário ${newDocId} excluído com sucesso.`);
             } catch (err) {
                 console.error('⚠️ Falha ao excluir arquivo temporário:', err.message);
-                // Não interrompe o fluxo principal
             }
         }
     }
@@ -612,6 +540,7 @@ app.post('/gerar-documento', isLogged, async (req, res) => {
 
 // --- ROTAS DE AUTENTICAÇÃO ---
 app.get('/auth', (req, res) => {
+    console.log('Acessando rota /auth');
     const authUrl = oauth2Client.generateAuthUrl({
         access_type: 'offline',
         scope: [
@@ -620,27 +549,21 @@ app.get('/auth', (req, res) => {
         ],
         prompt: 'consent'
     });
+    console.log('Generated auth URL:', authUrl);
     res.redirect(authUrl);
 });
 
 app.get('/oauth2callback', async (req, res) => {
     const { code } = req.query;
-    
     try {
         const { tokens } = await oauth2Client.getToken(code);
-        
-        // SALVA O REFRESH TOKEN 
         if (tokens.refresh_token) {
             console.log('✅ Refresh token obtido com sucesso!');
             console.log('*** NOVO REFRESH TOKEN (COPIAR E ADICIONAR AO RENDER):', tokens.refresh_token, '***');
-            // Em produção real, salve em um banco de dados
             process.env.GOOGLE_REFRESH_TOKEN = tokens.refresh_token;
         }
-        
         oauth2Client.setCredentials(tokens);
-        
         res.send('Autenticação Google concluída com sucesso! Você pode fechar esta página e voltar ao app.');
-        
     } catch (error) {
         console.error('Erro na autenticação:', error);
         res.send(`
@@ -651,21 +574,17 @@ app.get('/oauth2callback', async (req, res) => {
     }
 });
 
-// --- ROTAS EXISTENTES ---
 app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/login.html'));
 });
 
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
-
     console.log('🔐 TENTATIVA DE LOGIN:', { username, hasPassword: !!password });
-
     if (username !== USUARIO_PADRAO) {
         console.log('❌ USUÁRIO INVÁLIDO');
         return res.send('Falha no Login: Usuário ou Senha inválidos.'); 
     }
-
     try {
         const isMatch = await bcrypt.compare(password, HASH_DA_SENHA_SECRETA);
         console.log('🔐 COMPARAÇÃO DE SENHA:', { isMatch });
@@ -675,7 +594,6 @@ app.post('/login', async (req, res) => {
                 isAuthenticated: req.session.isAuthenticated
             });
             req.session.isAuthenticated = true;
-
             req.session.save((err) => {
                 if (err) {
                     console.error('ERRO AO SALVAR SESSÃO:', err);
@@ -693,22 +611,8 @@ app.post('/login', async (req, res) => {
     }
 });
 
-app.get('/', isLogged, async (req, res) => {
-    try {
-        await ensureAuth();
-        res.sendFile(path.join(__dirname, 'public/index.html'));
-    } catch (error) {
-        console.log('🔐 Redirecionando para OAuth:', error.message);
-        const authUrl = oauth2Client.generateAuthUrl({
-            access_type: 'offline',
-            scope: [
-                'https://www.googleapis.com/auth/drive',
-                'https://www.googleapis.com/auth/documents'
-            ],
-            prompt: 'consent'
-        });
-        res.redirect(authUrl);
-    }
+app.get('/', isLogged, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/index.html'));
 });
 
 app.get('/logout', (req, res) => {
@@ -717,22 +621,21 @@ app.get('/logout', (req, res) => {
     });
 });
 
-// --- INICIAR SERVIDOR ---
-app.listen(PORT, async () => {
-    console.log(`Servidor rodando em http://localhost:${PORT}`);
-    await checkDriveQuota();
-    
-    // Verificar se está autenticado
-    if (process.env.GOOGLE_REFRESH_TOKEN) {
-        console.log('✅ OAuth2 configurado com refresh_token');
-    } else {
-        console.log('⚠️  Acesse http://localhost:3000/auth para configurar OAuth2');
-    }
-});
 app.get('/debug-auth', (req, res) => {
     res.json({
         isAuthenticated: req.session.isAuthenticated,
         sessionId: req.sessionID,
         session: req.session
     });
+});
+
+// --- INICIAR SERVIDOR ---
+app.listen(PORT, async () => {
+    console.log(`Servidor rodando em http://localhost:${PORT}`);
+    await checkDriveQuota();
+    if (process.env.GOOGLE_REFRESH_TOKEN) {
+        console.log('✅ OAuth2 configurado com refresh_token');
+    } else {
+        console.log('⚠️ Acesse http://localhost:3000/auth para configurar OAuth2');
+    }
 });
