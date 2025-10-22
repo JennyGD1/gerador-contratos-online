@@ -290,7 +290,7 @@ const FormFields = {
             <h3 class="section-title">Assinatura</h3>
             <div class="form-group">
                 <label for="local-data-aditivo">Local e Data de Assinatura</label>
-                <input type="text" id="local-data-aditivo" name="local-data-aditivo" "[Local]/[UF], [dia] de [mês por extenso] de [ano]." oninput="updateVisualizacao('aditivo')" required>
+                <input type="text" id="local-data-aditivo" name="local-data-aditivo" placeholder= "[Local]/[UF], [dia] de [mês por extenso] de [ano]." oninput="updateVisualizacao('aditivo')" required>
             </div>
         </div>
     `,
