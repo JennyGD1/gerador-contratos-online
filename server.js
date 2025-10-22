@@ -448,7 +448,7 @@ app.use(session({
 }));
 
 // Middleware para arquivos estáticos
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public'), { index: false }));
 app.set('trust proxy', 1);
 
 // Middleware de autenticação (usuário/senha)
