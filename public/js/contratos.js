@@ -160,20 +160,20 @@ const FormFields = {
             <h3 class="section-title">III. OBJETO</h3>
             <div class="form-group">
                 <label for="servico-prestado">Serviço Especializado Prestado</label>
-                <input type="text" id="servico-prestado" name="servico-prestado" oninput="updateVisualizacao('minuta')" required>
+                <input type="text" id="servico-prestado" name="servico-prestado" oninput="updateVisualizacao('minuta')" placeholder = "Ex: Regulação Médica" required>
             </div>
             
             <div id="itens-objeto-container">
                 <!-- Item A (fixo) -->
                 <div class="form-group">
                     <label for="item-a">a. Descrição Detalhada do Serviço (Item A)</label>
-                    <textarea id="item-a" name="itens-objeto[]" rows="3" oninput="updateVisualizacao('minuta')" required></textarea>
+                    <textarea id="item-a" name="itens-objeto[]" rows="3" oninput="updateVisualizacao('minuta')" placeholder= "Realizar a análise detalhada das guias médicas, avaliando toda a documentação etc." required></textarea>
                 </div>
                 
                 <!-- Item B (fixo) -->
                 <div class="form-group">
                     <label for="item-b">b. Descrição Detalhada do Serviço (Item B)</label>
-                    <textarea id="item-b" name="itens-objeto[]" rows="3" oninput="updateVisualizacao('minuta')" required></textarea>
+                    <textarea id="item-b" name="itens-objeto[]" rows="3" oninput="updateVisualizacao('minuta')" placeholder= "Focar na avaliação e liberação, rápida das guias com caráter de urgência, etc." required></textarea>
                 </div>
                 
                 <!-- Itens dinâmicos serão adicionados aqui -->
@@ -201,12 +201,12 @@ const FormFields = {
                 <input type="date" id="data-fim" name="data-fim" onchange="updateVisualizacao('minuta')" required>
             </div>
             <div class="form-group">
-                <label for="valor-mensal">Valor Mensal do Contrato (Ex: R$ 5.000,00)</label>
-                <input type="text" id="valor-mensal" name="valor-mensal" oninput="updateVisualizacao('minuta')" required>
+                <label for="valor-mensal">Valor Mensal do Contrato</label>
+                <input type="text" id="valor-mensal" name="valor-mensal" oninput="updateVisualizacao('minuta')" placeholder= "R$200,00 (duzentos reais) por guia regulada" required>
             </div>
             <div class="form-group">
                 <label for="banco">Dados Bancários (Banco/Agência/Conta Corrente)</label>
-                <input type="text" id="banco" name="banco" placeholder="Ex: Itaú / Ag 1234 / CC 56789-0" oninput="updateVisualizacao('minuta')" required>
+                <input type="text" id="banco" name="banco" placeholder="Banco Sicoob, Agência nº 0000-0 e Conta Corrente nº 00.000.000-0" oninput="updateVisualizacao('minuta')" required>
             </div>
             <div class="form-group">
                 <label for="chave-pix">Chave PIX</label>
@@ -217,8 +217,8 @@ const FormFields = {
         <div class="form-group-section">
             <h3 class="section-title">Assinatura</h3>
             <div class="form-group">
-                <label for="local-data-contrato">Local e Data de Assinatura (Ex: Salvador/BA, 26 de Novembro de 2024)</label>
-                <input type="text" id="local-data-contrato" name="local-data-contrato" oninput="updateVisualizacao('minuta')" required>
+                <label for="local-data-contrato">Local e Data de Assinatura</label>
+                <input type="text" id="local-data-contrato" name="local-data-contrato" placeholder= "[Local]/[UF], [dia] de [mês por extenso] de [ano]." oninput="updateVisualizacao('minuta')" required>
             </div>
         </div>
     `,
@@ -263,25 +263,25 @@ const FormFields = {
             
             <div class="form-group-clausula">
                 <label for="clausula-primeira-objetivo">Cláusula Primeira</label>
-                <input type="text" id="clausula-primeira-objetivo" name="clausula-primeira-objetivo" oninput="updateVisualizacao('aditivo')" required>
+                <input type="text" id="clausula-primeira-objetivo" name="clausula-primeira-objetivo" placeholder= "Indicar qual o 1º objetivo do aditivo" oninput="updateVisualizacao('aditivo')" required>
                 <label for="clausula-primeira-alteracao">Indicar Alteração</label>
-                <textarea id="clausula-primeira-alteracao" name="clausula-primeira-alteracao" rows="5" oninput="updateVisualizacao('aditivo')" required placeholder="As Partes decidem, em comum acordo, alterar o valor mensal para R$ 10.000,00."></textarea>
+                <textarea id="clausula-primeira-alteracao" name="clausula-primeira-alteracao" rows="5" placeholder= "Informar a alteração" oninput="updateVisualizacao('aditivo')" required placeholder="As Partes decidem, em comum acordo, alterar o valor mensal para R$ 10.000,00."></textarea>
             </div>
             
             <div class="form-group-clausula">
                 <h4>Cláusula Segunda (Opcional)</h4>
                 <label for="clausula-segunda-objetivo">Cláusula Segunda (Preencha para incluir)</label>
-                <input type="text" id="clausula-segunda-objetivo" name="clausula-segunda-objetivo" oninput="updateVisualizacao('aditivo')" >
+                <input type="text" id="clausula-segunda-objetivo" name="clausula-segunda-objetivo" placeholder= "Indicar qual o 2º objetivo do aditivo" oninput="updateVisualizacao('aditivo')" >
                 <label for="clausula-segunda-alteracao">Indicar Alteração</label>
-                <textarea id="clausula-segunda-alteracao" name="clausula-segunda-alteracao" rows="5" oninput="updateVisualizacao('aditivo')"></textarea>
+                <textarea id="clausula-segunda-alteracao" name="clausula-segunda-alteracao" rows="5" placeholder= "Informar a alteração" oninput="updateVisualizacao('aditivo')"></textarea>
             </div>
             
             <div class="form-group-clausula">
                 <h4>Cláusula Terceira (Opcional)</h4>
                 <label for="clausula-terceira-objetivo">Cláusula Terceira (Preencha para incluir)</label>
-                <input type="text" id="clausula-terceira-objetivo" name="clausula-terceira-objetivo" oninput="updateVisualizacao('aditivo')" placeholder="Ex: DO NOVO ENDEREÇO">
+                <input type="text" id="clausula-terceira-objetivo" name="clausula-terceira-objetivo" placeholder= "Indicar qual o 3º objetivo do aditivo" oninput="updateVisualizacao('aditivo')" placeholder="Ex: DO NOVO ENDEREÇO">
                 <label for="clausula-terceira-alteracao">Indicar Alteração</label>
-                <textarea id="clausula-terceira-alteracao" name="clausula-terceira-alteracao" rows="5" oninput="updateVisualizacao('aditivo')"></textarea>
+                <textarea id="clausula-terceira-alteracao" name="clausula-terceira-alteracao" rows="5" placeholder= "Informar a alteração" oninput="updateVisualizacao('aditivo')"></textarea>
             </div>
 
         </div>
@@ -290,7 +290,7 @@ const FormFields = {
             <h3 class="section-title">Assinatura</h3>
             <div class="form-group">
                 <label for="local-data-aditivo">Local e Data de Assinatura</label>
-                <input type="text" id="local-data-aditivo" name="local-data-aditivo" oninput="updateVisualizacao('aditivo')" required>
+                <input type="text" id="local-data-aditivo" name="local-data-aditivo" "[Local]/[UF], [dia] de [mês por extenso] de [ano]." oninput="updateVisualizacao('aditivo')" required>
             </div>
         </div>
     `,
@@ -323,7 +323,7 @@ const FormFields = {
             <h3 class="section-title">Local e Data do Distrato</h3>
             <div class="form-group">
                 <label for="local-distrato">Local da Assinatura (Cidade/Estado + Data Completa)</label>
-                <input type="text" id="local-distrato" name="local-distrato" oninput="updateVisualizacao('distrato')" placeholder="Ex: Fortaleza/CE, 26 de Novembro de 2024" required>
+                <input type="text" id="local-distrato" name="local-distrato" oninput="updateVisualizacao('distrato')" placeholder= "[Local]/[UF], [dia] de [mês por extenso] de [ano]." required>
             </div>
         </div>
     `
