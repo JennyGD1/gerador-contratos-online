@@ -484,7 +484,7 @@ app.use(session({
 }));
 
 // Middleware para arquivos estáticos
-app.use(express.static(path.join(__dirname, 'public'), { index: false }));
+app.use(express.static(path.join(__dirname, 'public')));
 app.set('trust proxy', 1);
 
 // Middleware de autenticação (usuário/senha)
@@ -517,7 +517,7 @@ app.post('/gerar-documento', isLogged, async (req, res) => {
         }
         const substitutions = buildSubstitutionsMap(formData, templateName);
         console.log(`DEBUG: Copiando template ${templateId} para processamento...`);
-        
+
         const copyResponse = await drive.files.copy({
             fileId: templateId,
             requestBody: {
