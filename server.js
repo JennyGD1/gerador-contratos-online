@@ -209,15 +209,33 @@ function getContratadoDados(body) {
     const representante = body['representante-contratado'] || '{{NOME DO REPRESENTANTE}}';
     const cpf_rep = body['cpf-representante-contratado'] || '{{CPF DO REPRESENTANTE}}';
     const cargo_rep = body['cargo-representante-contratado'] || '{{CARGO}}';
+
+    const incluir_prestador = body['incluir-prestador'] === 'on'; // Checkbox retorna 'on' se marcado
+    const prestador_nome = body['prestador-nome'] || '{{NOME DO PRESTADOR DE SERVIÇO}}';
+    const prestador_cpf = body['prestador-cpf'] || '{{CPF DO PRESTADOR DE SERVIÇO}}';
+
+    let prestador_string = '';
+    if (incluir_prestador && prestador_nome && prestador_cpf) {
+        prestador_string = ` e como prestador de serviço o Sr. (Sra.) ${prestador_nome}, inscrito(a) no CPF sob o nº ${prestador_cpf}`;
+    }
     const assinatura_contratada = 
         `${nome}\n` +
         `${representante}`;
+        
+    const assinatura_prestador = (incluir_prestador && prestador_nome)
+        ? `${prestador_nome}\nPRESTADOR DE SERVIÇO`
+        : '';
+        
+    const dados_contratado = 
+        `${nome}, pessoa jurídica de direito privado, inscrita no CNPJ sob o nº ${cnpj_cpf}, com sede na ${endereco}, neste ato representada pelo seu ${cargo_rep}, o Sr. (Sra.) ${representante}, inscrito(a) no CPF sob o nº ${cpf_rep}${prestador_string}, doravante denominada “CONTRATADA";`;
+
     return {
         nome_completo: nome,
         nome: nome,
         cnpj_cpf: cnpj_cpf,
-        dados: `${nome}, pessoa jurídica de direito privado, inscrita no CNPJ sob o nº ${cnpj_cpf}, com sede na ${endereco}, neste ato representada pelo seu ${cargo_rep}, o Sr. (Sra.) ${representante}, inscrito(a) no CPF sob o nº ${cpf_rep}, doravante denominada “CONTRATADA";`,
-        assinatura: assinatura_contratada
+        dados: dados_contratado, 
+        assinatura: assinatura_contratada,
+        assinatura_prestador: assinatura_prestador
     };
 }
 
@@ -236,6 +254,7 @@ function buildSubstitutionsMap(formData, templateName) {
         'CONTRATADO_DADOS_COMPLETOS': contratado.dados,
         'ASSINATURA_CONTRATANTE': maida.assinatura,
         'ASSINATURA_CONTRATADA': contratado.assinatura,
+        'ASSINATURA_PRESTADOR': contratado.assinatura_prestador,
     };
     let specificFields = {};
     if (templateName === 'Contrato Prestacao Servico') {
@@ -334,7 +353,7 @@ function buildSubstitutionsMap(formData, templateName) {
 
 function createCleanupRequests(placeholdersToCleanup) {
     const cleanupRequests = [];
-    const regex = /\{\{[A-Z0-9_]+\}\}/g;
+    
     placeholdersToCleanup.forEach(placeholder => {
         cleanupRequests.push({
             replaceAllText: {
@@ -346,15 +365,21 @@ function createCleanupRequests(placeholdersToCleanup) {
             }
         });
     });
+    
     return cleanupRequests;
 }
 
 function createSubstitutionRequests(substitutionsMap) {
     const requests = [];
+    const placeholdersParaLimpar = [];
     for (const tag in substitutionsMap) {
         let value = substitutionsMap[tag] || '';
         const placeholder = `{{${tag.toUpperCase()}}}`;
         if (tag === 'RODAPE_CONTRATANTE') {
+            continue;
+        }
+        if (tag === 'ASSINATURA_PRESTADOR' && !value.trim()) {
+            placeholdersParaLimpar.push(placeholder);
             continue;
         }
         if (tag === 'ITENS_OBJETO_COMPLETO') {
@@ -391,6 +416,17 @@ function createSubstitutionRequests(substitutionsMap) {
             });
         }
     }
+    placeholdersParaLimpar.forEach(placeholder => {
+        requests.push({
+            replaceAllText: {
+                containsText: {
+                    text: placeholder,
+                    matchCase: true,
+                },
+                replaceText: '', 
+            }
+        });
+    });
     return requests;
 }
 
@@ -481,6 +517,7 @@ app.post('/gerar-documento', isLogged, async (req, res) => {
         }
         const substitutions = buildSubstitutionsMap(formData, templateName);
         console.log(`DEBUG: Copiando template ${templateId} para processamento...`);
+        
         const copyResponse = await drive.files.copy({
             fileId: templateId,
             requestBody: {
