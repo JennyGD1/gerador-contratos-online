@@ -434,7 +434,9 @@ app.use(express.json());
 const redisClient = redis.createClient({
     url: process.env.REDIS_URL || 'redis://localhost:6379'
 });
-redisClient.connect().catch(console.error);
+redisClient.on('error', (err) => {
+    console.error('Erro no Redis Client:', err);
+});
 
 // Configurar sessão com Redis
 app.use(session({
@@ -446,7 +448,7 @@ app.use(session({
 }));
 
 // Middleware para arquivos estáticos
-app.use('/static', express.static(path.join(__dirname, 'public'), {
+app.use(express.static(path.join(__dirname, 'public'), {
     setHeaders: (res, path) => {
         if (path.endsWith('login.html') || path.match(/\.(css|js|png|jpg|jpeg|gif|ico)$/)) {
             return;
@@ -632,10 +634,18 @@ app.get('/debug-auth', (req, res) => {
 // --- INICIAR SERVIDOR ---
 app.listen(PORT, async () => {
     console.log(`Servidor rodando em http://localhost:${PORT}`);
-    await checkDriveQuota();
-    if (process.env.GOOGLE_REFRESH_TOKEN) {
-        console.log('✅ OAuth2 configurado com refresh_token');
-    } else {
-        console.log('⚠️ Acesse http://localhost:3000/auth para configurar OAuth2');
+    try {
+        await redisClient.connect();
+        console.log('✅ Conexão com Redis estabelecida!');
+
+        await checkDriveQuota();
+        if (process.env.GOOGLE_REFRESH_TOKEN) {
+            console.log('✅ OAuth2 configurado com refresh_token');
+        } else {
+            console.log('⚠️ Acesse http://localhost:3000/auth para configurar OAuth2');
+        }
+    } catch (error) {
+        console.error('❌ ERRO CRÍTICO: Falha ao conectar ao Redis. O servidor será encerrado.', error.message);
+        process.exit(1); 
     }
 });
