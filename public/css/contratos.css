@@ -31,50 +31,53 @@ body, html {
 
 /* --- BARRA DE NAVEGAÇÃO (NAV) --- */
 nav {
-    width: 100%;
-    background: linear-gradient(135deg, rgba(0, 112, 255, 0.9) 0%, rgba(32, 61, 130, 0.9) 100%);
-    padding: 0 5%;
-    margin: 0;
-    box-shadow: var(--shadow);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    backdrop-filter: blur(10px);
-}
-nav ul {
-    display: flex;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    align-items: center;
-}
-nav a {
-    color: white;
-    text-decoration: none;
-    padding: 20px 25px;
-    font-size: 1.1em;
-    font-weight: 500;
-    display: block;
-    transition: all 0.3s ease;
-}
-nav a:hover {
-    color: white;
-    background-color: rgba(255, 255, 255, 0.15);
-}
-nav a::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 25px;
-    right: 25px;
-    height: 3px;
-    background-color: var(--maida-pink);
-    transform: scaleX(0);
-    transition: transform 0.3s ease;
-}
-nav a:hover::after {
-    transform: scaleX(1);
-}
+            width: 100%;
+            background: linear-gradient(135deg, rgba(0, 112, 255, 0.9) 0%, rgba(32, 61, 130, 0.7) 100%);
+            padding: 0 5%;
+            margin: 0;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px); /* Adiciona efeito de desfoque no conteúdo behind */
+        }
+        nav ul {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            align-items: center;
+        }
+        nav li {
+            position: relative;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 20px 25px;
+            font-size: 1.1em;
+            font-weight: 500;
+            display: block;
+            transition: all 0.3s ease;
+        }
+        nav a:hover {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 25px;
+            right: 25px;
+            height: 3px;
+            background-color: var(--maida-pink);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        nav a:hover::after {
+            transform: scaleX(1);
+        }
 .logo {
     font-weight: 700;
     font-size: 1.4em;
