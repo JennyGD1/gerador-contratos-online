@@ -58,7 +58,22 @@ nav a {
     transition: all 0.3s ease;
 }
 nav a:hover {
+    color: white;
     background-color: rgba(255, 255, 255, 0.15);
+}
+nav a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 25px;
+    right: 25px;
+    height: 3px;
+    background-color: var(--maida-pink);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+nav a:hover::after {
+    transform: scaleX(1);
 }
 .logo {
     font-weight: 700;
@@ -330,9 +345,6 @@ nav a:hover {
     outline: none;
     border-color: var(--maida-pink);
     box-shadow: 0 0 0 3px rgba(238, 44, 130, 0.1);
-}
-.form-group-maida-data{
-
 }
 
 /* --- ESTILOS PARA SEÇÕES DO FORMULÁRIO --- */
