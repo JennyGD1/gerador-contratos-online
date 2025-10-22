@@ -507,14 +507,16 @@ app.post('/gerar-documento', isLogged, async (req, res) => {
             });
             console.log('✅ Limpeza final de placeholders não utilizados aplicada.');
         }
-        const pdfResponse = await drive.files.export({
+        const docxResponse = await drive.files.export({
             fileId: newDocId, 
-            mimeType: 'application/pdf',
+            mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         }, { responseType: 'arraybuffer' });
-        const pdfBuffer = Buffer.from(pdfResponse.data);
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `attachment; filename="${copyResponse.data.name}.pdf"`);
-        res.send(pdfBuffer);
+        
+        const docxBuffer = Buffer.from(docxResponse.data);
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+        res.setHeader('Content-Disposition', `attachment; filename="${copyResponse.data.name}.docx"`);
+        
+        res.send(docxBuffer);
     } catch (error) {
         console.error('Erro na geração do documento:', error);
         if (!res.headersSent) {
