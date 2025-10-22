@@ -490,16 +490,18 @@ app.set('trust proxy', 1);
 // Middleware de autenticação (usuário/senha)
 function isLogged(req, res, next) {
     console.log('🔐 VERIFICAÇÃO DE SESSÃO:', {
+        path: req.path,
         hasSession: !!req.session,
-        isAuthenticated: req.session.isAuthenticated,
-        sessionKeys: Object.keys(req.session),
-        path: req.path
+        isAuthenticated: req.session.isAuthenticated
     });
+    
     if (req.session && req.session.isAuthenticated === true) {
-        console.log('✅ USUÁRIO AUTENTICADO - Permitindo acesso');
+        console.log('✅ USUÁRIO AUTENTICADO - Permitindo acesso para:', req.path);
         return next();
     } else {
         console.log('🛑 USUÁRIO NÃO AUTENTICADO - Redirecionando para /login');
+        // Salva a URL original para redirecionar após o login
+        req.session.returnTo = req.originalUrl;
         return res.redirect('/login');
     }
 }
@@ -615,25 +617,30 @@ app.get('/login', (req, res) => {
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
     console.log('🔐 TENTATIVA DE LOGIN:', { username, hasPassword: !!password });
+    
     if (username !== USUARIO_PADRAO) {
         console.log('❌ USUÁRIO INVÁLIDO');
         return res.send('Falha no Login: Usuário ou Senha inválidos.'); 
     }
+    
     try {
         const isMatch = await bcrypt.compare(password, HASH_DA_SENHA_SECRETA);
         console.log('🔐 COMPARAÇÃO DE SENHA:', { isMatch });
+        
         if (isMatch) {
-            console.log('✅ LOGIN BEM-SUCEDIDO - Sessão:', {
-                sessionId: req.sessionID,
-                isAuthenticated: req.session.isAuthenticated
-            });
+            console.log('✅ LOGIN BEM-SUCEDIDO');
             req.session.isAuthenticated = true;
+            
             req.session.save((err) => {
                 if (err) {
                     console.error('ERRO AO SALVAR SESSÃO:', err);
                     return res.status(500).send("Erro ao salvar a sessão.");
                 }
-                res.redirect('/'); 
+                
+                const returnTo = req.session.returnTo || '/';
+                delete req.session.returnTo; 
+                console.log('🔄 REDIRECIONANDO PARA:', returnTo);
+                res.redirect(returnTo);
             });
         } else {
             console.log('❌ SENHA INVÁLIDA');
