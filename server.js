@@ -655,7 +655,13 @@ app.post('/login', async (req, res) => {
 app.get('/', isLogged, (req, res) => {
     res.sendFile(path.join(__dirname, 'public/index.html'));
 });
+app.get('/contratos', isLogged, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/contratos.html'));
+});
 
+app.get('/login', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/login.html'));
+});
 app.get('/logout', (req, res) => {
     req.session.destroy(() => {
         res.redirect('/login');
