@@ -60,7 +60,7 @@ function getMaidaData(cnpj, repData = {}) {
 }
 function getContratadoDados(form) {
     const nome = form['razao-social-contratado']?.value || '{{CONTRATADO RAZÃO SOCIAL}}';
-    const cnpj_cpf = form['cnpj-cpf-contratado']?.value || '{{CNPJ/CPF DO CONTRATADO}}';
+    const cnpj_cpf = form['cnpj-contratado']?.value || '{{CNPJ DO CONTRATADO}}';
     const endereco = form['endereco-contratado']?.value || '{{ENDEREÇO COMPLETO DO CONTRATADO}}';
     const representante = form['representante-contratado']?.value || '{{NOME DO REPRESENTANTE}}';
     const cpf_rep = form['cpf-representante-contratado']?.value || '{{CPF DO REPRESENTANTE}}';
@@ -130,7 +130,7 @@ const FormFields = {
                 <input type="text" id="razao-social-contratado" name="razao-social-contratado" oninput="updateVisualizacao('${modelo}')" required>
             </div>
             <div class="form-group">
-                <label for="cnpj-cpf-contratado">CNPJ do Contratado</label>
+                <label for="cnpj-contratado">CNPJ do Contratado</label>
                 <input type="text" id="cnpj-contratado" name="cnpj-contratado" oninput="updateVisualizacao('${modelo}')" required>
             </div>
             <div class="form-group">
@@ -519,13 +519,10 @@ window.updateVisualizacao = function(modeloTag) {
         
         fields['{{ITENS_OBJETO_DINAMICOS}}'] = htmlItens;
     } else if (modeloTag === 'aditivo') {
-        // <<<<<<<<<<<<<<< INÍCIO DO BLOCO CORRIGIDO ADITIVO >>>>>>>>>>>>>>>
 
         // Mapeamento dos campos fixos do Aditivo
         fields = {
-            // Seus campos fixos do aditivo, como antes
             '{{CONTRATO_ORIGINAL}}': form['contrato-original']?.value,
-            //... outros campos fixos
             '{{DATA_ASSINATURA_ORIGINAL}}': form['data-assinatura-original']?.value ? formatDateBR(form['data-assinatura-original'].value) : 'XX/XX/XXXX',
             '{{INTUITO_ADITIVO}}': form['intuito-aditivo']?.value,
             '{{CLAUSULA-PRIMEIRA-OBJETIVO}}': form['clausula-primeira-objetivo']?.value,
@@ -533,7 +530,6 @@ window.updateVisualizacao = function(modeloTag) {
             '{{LOCAL_DATA_ADITIVO}}': form['local-data-aditivo']?.value,
             '{{NUMERO_ADITIVO}}': form['numero_aditivo']?.value,
             '{{INDICAR_O_CONTRATO}}': form['indicar_o_contrato']?.value,
-            //...
         };
 
         // 1. Geração dos Considerandos Adicionais (c, d, e...)
@@ -625,7 +621,7 @@ window.updateVisualizacao = function(modeloTag) {
 
 function applyMasks() {
     // 1. CNPJ/CPF do Contratado (Campo principal)
-    const cnpjCpfInput = document.getElementById('cnpj-cpf-contratado');
+    const cnpjCpfInput = document.getElementById('cnpj-contratado');
     
     if (cnpjCpfInput) {
         // Usa uma máscara dinâmica para alternar entre CPF e CNPJ
@@ -657,6 +653,13 @@ function applyMasks() {
     const cpfRepInput = document.getElementById('cpf-representante-contratado');
     if (cpfRepInput) {
         IMask(cpfRepInput, {
+            mask: '000.000.000-00',
+            lazy: false
+        });
+    }
+    const cpfMaidaInput = document.getElementById('rep-maida-cpf');
+    if (cpfMaidaInput) {
+        IMask(cpfMaidaInput, {
             mask: '000.000.000-00',
             lazy: false
         });
