@@ -66,16 +66,31 @@ function getContratadoDados(form) {
     const cpf_rep = form['cpf-representante-contratado']?.value || '{{CPF DO REPRESENTANTE}}';
     const cargo_rep = form['cargo-representante-contratado']?.value || '{{CARGO}}';
 
+    const incluir_prestador = form['incluir-prestador']?.checked || false;
+    const prestador_nome = form['prestador-nome']?.value || '{{NOME DO PRESTADOR DE SERVIÇO}}';
+    const prestador_cpf = form['prestador-cpf']?.value || '{{CPF DO PRESTADOR DE SERVIÇO}}';
+
+    let prestador_string = '';
+    if (incluir_prestador && prestador_nome && prestador_cpf) {
+        prestador_string = ` e como prestador de serviço o Sr. (Sra.) ${prestador_nome}, inscrito(a) no CPF sob o nº ${prestador_cpf}`;
+    }
     const assinatura_contratada = 
         `${nome}\n` +
         `${representante}`;
 
+    const assinatura_prestador = (incluir_prestador && prestador_nome)
+        ? `${prestador_nome}\nPRESTADOR DE SERVIÇO`
+        : '';
+
+    const dados_contratado = 
+        `${nome}, pessoa jurídica de direito privado, inscrita no CNPJ sob o nº ${cnpj_cpf}, com sede na ${endereco}, neste ato representada pelo seu ${cargo_rep}, o Sr. (Sra.) ${representante}, inscrito(a) no CPF sob o nº ${cpf_rep}${prestador_string}, doravante denominada “CONTRATADA”;`;
+
     return {
         nome: nome,
         cnpj_cpf: cnpj_cpf,
-        // Texto formatado para a visualização
-        dados: `${nome}, pessoa jurídica de direito privado, inscrita no CNPJ sob o nº ${cnpj_cpf}, com sede na ${endereco}, neste ato representada pelo seu ${cargo_rep}, o Sr. (Sra.) ${representante}, inscrito(a) no CPF sob o nº ${cpf_rep}, doravante denominada “CONTRATADA”;`,
-        assinatura: assinatura_contratada
+        dados: dados_contratado, 
+        assinatura: assinatura_contratada,
+        assinatura_prestador: assinatura_prestador 
     };
 }
 
@@ -149,6 +164,23 @@ const FormFields = {
                 <label for="cargo-representante-contratado">Cargo do Representante Legal</label>
                 <input type="text" id="cargo-representante-contratado" name="cargo-representante-contratado" oninput="updateVisualizacao('${modelo}')" value="Sócio" required>
             </div>
+        </div>    
+        <div class="form-group-section prestador-section">
+            <h3 class="section-title">Incluir Prestador de Serviço?</h3>
+            <div class="form-group checkbox-group">
+                <input type="checkbox" id="incluir-prestador" name="incluir-prestador" onchange="togglePrestadorFields(this, '${modelo}')">
+                <label for="incluir-prestador">Deseja adicionar Prestador de Serviço?</label>
+            </div>
+            <div id="prestador-fields" style="display:none;">
+                <div class="form-group">
+                    <label for="prestador-nome">Nome do Prestador de Serviço</label>
+                    <input type="text" id="prestador-nome" name="prestador-nome" oninput="updateVisualizacao('${modelo}')">
+                </div>
+                <div class="form-group">
+                    <label for="prestador-cpf">CPF do Prestador de Serviço</label>
+                    <input type="text" id="prestador-cpf" name="prestador-cpf" oninput="updateVisualizacao('${modelo}')">
+                </div>
+            </div>    
         </div>
     `,
 
@@ -367,6 +399,7 @@ const MINUTA_CONTRATO_HTML = `
             </td>
             <td style="width: 50%; padding: 20px; border-top: 1px solid #333;">
                 <p><strong>{{ASSINATURA_CONTRATADA}}</strong></p>
+                <p><strong>{{ASSINATURA_PRESTADOR}}</strong></p>
             </td>
         </tr>
     </table>
@@ -421,6 +454,7 @@ const ADITIVO_CONTRATUAL_HTML = `
             </td>
             <td style="width: 50%; padding: 20px; border-top: 1px solid #333;">
                 <p><strong>{{ASSINATURA_CONTRATADA}}</strong></p>
+                <p><strong>{{ASSINATURA_PRESTADOR}}</strong></p>
             </td>
         </tr>
     </table>
@@ -458,6 +492,7 @@ const DISTRATO_CONTRATUAL_HTML = `
             </td>
             <td style="width: 50%; padding: 20px; border-top: 1px solid #333;">
                 <p><strong>{{ASSINATURA_CONTRATADA}}</strong></p>
+                <p><strong>{{ASSINATURA_PRESTADOR}}</strong></p>
             </td>
         </tr>
     </table>
@@ -508,6 +543,7 @@ window.updateVisualizacao = function(modeloTag) {
             '{{CONTRATADO_BANCO}}': form['banco']?.value,
             '{{CONTRATADO_PIX}}': form['chave-pix']?.value,
             '{{LOCAL_DATA}}': form['local-data-contrato']?.value,
+            '{{ASSINATURA_PRESTADOR}}': contratado.assinatura_prestador
         };
         
         const itensObjeto = getItensObjeto();
@@ -596,7 +632,8 @@ window.updateVisualizacao = function(modeloTag) {
         '{{CONTRATANTE_DADOS_COMPLETOS}}': maida.dados,
         '{{CONTRATADO_DADOS_COMPLETOS}}': contratado.dados,
         '{{ASSINATURA_CONTRATANTE}}': maida.assinatura,
-        '{{ASSINATURA_CONTRATADA}}': contratado.assinatura
+        '{{ASSINATURA_CONTRATADA}}': contratado.assinatura,
+        '{{ASSINATURA_PRESTADOR}}': contratado.assinatura_prestador
     };
 
     // Combina todos os campos
@@ -664,6 +701,13 @@ function applyMasks() {
             lazy: false
         });
     }
+    const prestadorCpfInput = document.getElementById('prestador-cpf');
+    if (prestadorCpfInput) {
+        IMask(prestadorCpfInput, {
+            mask: '000.000.000-00',
+            lazy: false
+        });
+    }    
 }
 // 8. FUNÇÃO PRINCIPAL PARA RENDERIZAR O FORMULÁRIO
 function renderForm(templateName) {
@@ -852,6 +896,7 @@ function reorganizarConsiderandos() {
         label.setAttribute('for', `considerando-${novaLetra}`);
         
     });
+    updateVisualizacao('aditivo')
 }
 
 function getConsiderandosAdicionais() {
@@ -869,3 +914,20 @@ function getConsiderandosAdicionais() {
     });
     return considerandos;
 }
+window.togglePrestadorFields = function(checkbox, modelo) {
+    const prestadorSection = checkbox.closest('.prestador-section');
+    const fieldsDiv = prestadorSection.querySelector('#prestador-fields');
+
+    if (checkbox.checked) {
+        fieldsDiv.style.display = 'block';
+    } else {
+        fieldsDiv.style.display = 'none';
+        // Limpa os campos quando esconder
+        const prestadorNome = document.getElementById('prestador-nome');
+        const prestadorCpf = document.getElementById('prestador-cpf');
+        
+        if (prestadorNome) prestadorNome.value = '';
+        if (prestadorCpf) prestadorCpf.value = '';
+    }
+    updateVisualizacao(modelo);
+};
