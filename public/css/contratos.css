@@ -605,84 +605,6 @@ footer {
     font-size: 0.9em;
     opacity: 0.8;
 }
-
-/* --- RESPONSIVIDADE --- */
-@media (max-width: 1024px) {
-    .grid-contrato {
-        grid-template-columns: 1fr;
-        padding: 0 25px;
-    }
-    .visualizacao-container {
-        position: static;
-        max-height: none;
-    }
-    
-    .grid-modelos {
-        grid-template-columns: 1fr;
-    }
-    
-    .conteudoindex {
-        padding: 25px;
-    }
-    
-    .secao-formulario {
-        padding: 25px;
-    }
-}
-
-@media (max-width: 768px) {
-    nav ul {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    
-    nav a {
-        padding: 15px 20px;
-        width: 100%;
-    }
-    
-    .logo {
-        margin-right: 0;
-        padding: 15px 20px;
-    }
-    
-    .form-group-section {
-        padding: 15px;
-    }
-    
-    .footer-links {
-        flex-direction: column;
-        gap: 15px;
-    }
-    
-    .titulo-capa {
-        font-size: 1.5em;
-    }
-}
-
-@media (max-width: 480px) {
-    .partedois {
-        padding: 30px 15px;
-    }
-    
-    .conteudoindex {
-        padding: 20px;
-    }
-    
-    .secao-formulario {
-        padding: 20px;
-    }
-    
-    .template-card {
-        padding: 20px;
-    }
-    
-    .submit-button {
-        padding: 14px 20px;
-        font-size: 1em;
-    }
-}
-
 /* --- ANIMAÇÕES --- */
 @keyframes fadeIn {
     from {
@@ -762,7 +684,7 @@ footer {
     
     .logo {
         margin-right: 0;
-        padding: 15px 20px;
+        padding: 10px;
         justify-content: center;
         width: 100%;
     }
@@ -777,7 +699,9 @@ footer {
     }
     
     .titulo-capa {
-        font-size: 1.5em;
+        font-size: 2em;
+        padding: 20px;
+        margin: 0 15px;
     }
     
     .grid-contrato {
