@@ -187,7 +187,7 @@ form h3 {
 }
 .linha {
     position: absolute;
-    z-index: 2; /* Aumentei para garantir que fique acima do form */
+    z-index: 2;
     background-image: url('../img/line-wave.png');
     background-size: contain;
     background-repeat: no-repeat;
@@ -199,4 +199,282 @@ form h3 {
     transform: translateX(-50%);
     width: 300px; 
     height: 80px; 
+}
+/* --- RESPONSIVIDADE LOGIN --- */
+@media (max-width: 768px) {
+    .background {
+        width: 350px;
+        height: 450px;
+    }
+    
+    form {
+        width: 350px;
+        height: 550px;
+        padding: 40px 30px;
+    }
+    
+    form h3 {
+        font-size: 26px;
+    }
+    
+    .shape:first-child {
+        left: -60px;
+        top: -60px;
+        height: 150px;
+        width: 150px;
+    }
+    
+    .shape:last-child {
+        right: -20px;
+        bottom: -60px;
+        height: 150px;
+        width: 150px;
+    }
+    
+    .rotating-circle {
+        width: 180px;
+        height: 180px;
+        right: -30px;
+        top: -60px;
+    }
+    
+    .linha {
+        width: 250px;
+        height: 60px;
+        bottom: -25px;
+        left: 50%;
+    }
+    
+    .logo-area .logomaida {
+        height: 70px;
+    }
+    
+    .logo-area img {
+        height: 30px;
+    }
+    
+    input {
+        height: 45px;
+    }
+    
+    button {
+        margin-top: 40px;
+        padding: 12px 0;
+        font-size: 16px;
+    }
+    
+    .social {
+        margin-top: 25px;
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .social div {
+        width: 100%;
+        margin-left: 0 !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .background {
+        width: 300px;
+        height: 400px;
+    }
+    
+    form {
+        width: 300px;
+        height: 500px;
+        padding: 30px 25px;
+    }
+    
+    form h3 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    
+    .shape:first-child {
+        left: -40px;
+        top: -40px;
+        height: 120px;
+        width: 120px;
+    }
+    
+    .shape:last-child {
+        right: -15px;
+        bottom: -40px;
+        height: 120px;
+        width: 120px;
+    }
+    
+    .rotating-circle {
+        width: 150px;
+        height: 150px;
+        right: -25px;
+        top: -50px;
+    }
+    
+    .linha {
+        width: 200px;
+        height: 50px;
+        bottom: -20px;
+    }
+    
+    .logo-area .logomaida {
+        height: 60px;
+    }
+    
+    .logo-area img {
+        height: 25px;
+    }
+    
+    label {
+        margin-top: 20px;
+        font-size: 14px;
+    }
+    
+    input {
+        height: 40px;
+        font-size: 13px;
+    }
+    
+    button {
+        margin-top: 35px;
+        padding: 10px 0;
+        font-size: 15px;
+    }
+    
+    .social {
+        margin-top: 20px;
+    }
+}
+
+@media (max-width: 360px) {
+    .background {
+        width: 280px;
+        height: 380px;
+    }
+    
+    form {
+        width: 280px;
+        height: 480px;
+        padding: 25px 20px;
+    }
+    
+    form h3 {
+        font-size: 22px;
+    }
+    
+    .shape:first-child {
+        left: -30px;
+        top: -30px;
+        height: 100px;
+        width: 100px;
+    }
+    
+    .shape:last-child {
+        right: -10px;
+        bottom: -30px;
+        height: 100px;
+        width: 100px;
+    }
+    
+    .rotating-circle {
+        width: 120px;
+        height: 120px;
+        right: -20px;
+        top: -40px;
+    }
+    
+    .linha {
+        width: 180px;
+        height: 45px;
+        bottom: -15px;
+    }
+    
+    .logo-area .logomaida {
+        height: 50px;
+    }
+    
+    .logo-area img {
+        height: 22px;
+    }
+    
+    input {
+        height: 38px;
+    }
+    
+    button {
+        margin-top: 30px;
+        font-size: 14px;
+    }
+}
+
+/* Orientação landscape em mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+    .background {
+        height: 380px;
+    }
+    
+    form {
+        height: 450px;
+        padding: 30px 25px;
+    }
+    
+    form h3 {
+        font-size: 22px;
+        margin-bottom: 20px;
+    }
+    
+    label {
+        margin-top: 15px;
+    }
+    
+    button {
+        margin-top: 25px;
+        padding: 10px 0;
+    }
+    
+    .social {
+        margin-top: 20px;
+    }
+    
+    .rotating-circle {
+        width: 120px;
+        height: 120px;
+        right: -20px;
+        top: -40px;
+    }
+}
+
+/* Ajustes para telas muito altas */
+@media (min-height: 900px) and (max-width: 768px) {
+    form {
+        height: 600px;
+    }
+    
+    .background {
+        height: 520px;
+    }
+}
+
+/* Ajustes para tablets em modo retrato */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .background {
+        width: 380px;
+        height: 480px;
+    }
+    
+    form {
+        width: 380px;
+        height: 580px;
+    }
+    
+    .rotating-circle {
+        width: 200px;
+        height: 200px;
+    }
+    
+    .linha {
+        width: 280px;
+    }
 }

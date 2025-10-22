@@ -724,3 +724,166 @@ footer {
     scrollbar-width: thin;
     scrollbar-color: var(--maida-blue) #f1f1f1;
 }
+/* --- RESPONSIVIDADE --- */
+@media (max-width: 1024px) {
+    .grid-contrato {
+        grid-template-columns: 1fr;
+        padding: 0 25px;
+    }
+    .visualizacao-container {
+        position: static;
+        max-height: none;
+    }
+    
+    .grid-modelos {
+        grid-template-columns: 1fr;
+    }
+    
+    .conteudoindex {
+        padding: 25px;
+    }
+    
+    .secao-formulario {
+        padding: 25px;
+    }
+}
+
+@media (max-width: 768px) {
+    nav ul {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    nav a {
+        padding: 15px 20px;
+        width: 100%;
+    }
+    
+    .logo {
+        margin-right: 0;
+        padding: 15px 20px;
+    }
+    
+    .form-group-section {
+        padding: 15px;
+    }
+    
+    .footer-links {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .titulo-capa {
+        font-size: 1.5em;
+    }
+    
+    .grid-contrato {
+        gap: 20px;
+    }
+    
+    .secao-modelos h2, 
+    .secao-formulario h2 {
+        font-size: 1.5em;
+    }
+}
+
+@media (max-width: 480px) {
+    .partedois {
+        padding: 30px 15px;
+    }
+    
+    .conteudoindex {
+        padding: 20px;
+    }
+    
+    .secao-formulario {
+        padding: 20px;
+    }
+    
+    .template-card {
+        padding: 20px;
+    }
+    
+    .submit-button {
+        padding: 14px 20px;
+        font-size: 1em;
+    }
+    
+    .visualizacao-container {
+        padding: 20px;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 10px 14px;
+        font-size: 0.95em;
+    }
+    
+    .btn-adicionar-item,
+    .btn-remover-item {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .item-dinamico,
+    .item-campo {
+        padding: 12px;
+    }
+}
+
+/* Mobile First - Ajustes adicionais para telas muito pequenas */
+@media (max-width: 360px) {
+    .partedois {
+        padding: 20px 10px;
+    }
+    
+    .conteudoindex,
+    .secao-formulario {
+        padding: 15px;
+    }
+    
+    .template-card {
+        padding: 15px;
+    }
+    
+    .titulo-capa {
+        font-size: 1.3em;
+        margin: 0 10px;
+    }
+    
+    .secao-modelos h2, 
+    .secao-formulario h2 {
+        font-size: 1.3em;
+    }
+    
+    .grid-modelos {
+        gap: 15px;
+    }
+}
+
+/* Orientação landscape em mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+    .inicio {
+        height: auto;
+        min-height: 80px;
+        padding: 20px 0;
+    }
+    
+    .visualizacao-container {
+        max-height: 60vh;
+    }
+}
+
+/* Ajustes para tablets em modo retrato */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .grid-contrato {
+        grid-template-columns: 1fr;
+        max-width: 90%;
+    }
+    
+    .form-coluna,
+    .visualizacao-coluna {
+        order: 0; /* Reseta a ordem para o fluxo normal */
+    }
+}
