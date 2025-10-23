@@ -498,7 +498,9 @@ app.use(session({
 }));
 
 // Middleware para arquivos estáticos
-app.use(express.static(path.join(__dirname, 'public')));
+app.use('/css', express.static(path.join(__dirname, 'public/css')));
+app.use('/js', express.static(path.join(__dirname, 'public/js')));
+app.use('/img', express.static(path.join(__dirname, 'public/img')));
 app.set('trust proxy', 1);
 
 function isLogged(req, res, next) {
