@@ -468,41 +468,67 @@ app.use(express.json());
 
 // Configurar Redis
 const redisClient = redis.createClient({
-    url: process.env.REDIS_URL || 'redis://localhost:6379'
+    url: process.env.REDIS_URL || 'redis://localhost:6379',
+    socket: {
+        connectTimeout: 60000,
+        lazyConnect: true,
+    }
 });
+
 redisClient.on('error', (err) => {
-    console.error('Erro no Redis Client:', err);
+    console.error('❌ Erro no Redis Client:', err.message);
 });
 
 // Configurar sessão com Redis
 app.use(session({
-    store: new RedisStore({ client: redisClient }),
+    store: new RedisStore({ 
+        client: redisClient,
+        prefix: 'maida:sess:'  
+    }),
     secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 1000 * 60 * 60 * 24, secure: process.env.NODE_ENV === 'production' }
+    cookie: { 
+        maxAge: 1000 * 60 * 60 * 24, 
+        secure: process.env.NODE_ENV === 'production',
+        httpOnly: true,
+        sameSite: 'lax'
+    },
+    name: 'maida.session'  
 }));
 
 // Middleware para arquivos estáticos
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('trust proxy', 1);
 
-// Middleware de autenticação (usuário/senha)
 function isLogged(req, res, next) {
     console.log('🔐 VERIFICAÇÃO DE SESSÃO:', {
         path: req.path,
         hasSession: !!req.session,
-        isAuthenticated: req.session.isAuthenticated
+        isAuthenticated: req.session?.isAuthenticated,
+        sessionId: req.sessionID
     });
+    
+    // Lista de rotas públicas
+    const publicRoutes = ['/login', '/auth', '/oauth2callback', '/debug-auth'];
+    if (publicRoutes.includes(req.path)) {
+        return next();
+    }
     
     if (req.session && req.session.isAuthenticated === true) {
         console.log('✅ USUÁRIO AUTENTICADO - Permitindo acesso para:', req.path);
         return next();
     } else {
         console.log('🛑 USUÁRIO NÃO AUTENTICADO - Redirecionando para /login');
-        // Salva a URL original para redirecionar após o login
-        req.session.returnTo = req.originalUrl;
-        return res.redirect('/login');
+        
+        // DESTRÓI a sessão antes de redirecionar
+        if (req.session) {
+            req.session.destroy(() => {
+                res.redirect('/login');
+            });
+        } else {
+            res.redirect('/login');
+        }
     }
 }
 
@@ -660,12 +686,27 @@ app.get('/contratos', isLogged, (req, res) => {
 });
 
 app.get('/login', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/login.html'));
+    if (req.session) {
+        req.session.destroy(() => {
+            res.sendFile(path.join(__dirname, 'public/login.html'));
+        });
+    } else {
+        res.sendFile(path.join(__dirname, 'public/login.html'));
+    }
 });
 app.get('/logout', (req, res) => {
-    req.session.destroy(() => {
+    console.log('🚪 SOLICITAÇÃO DE LOGOUT');
+    if (req.session) {
+        req.session.destroy((err) => {
+            if (err) {
+                console.error('Erro ao destruir sessão no logout:', err);
+            }
+            console.log('✅ SESSÃO DESTRUÍDA COM SUCESSO');
+            res.redirect('/login');
+        });
+    } else {
         res.redirect('/login');
-    });
+    }
 });
 
 app.get('/debug-auth', (req, res) => {
@@ -678,7 +719,7 @@ app.get('/debug-auth', (req, res) => {
 
 // --- INICIAR SERVIDOR ---
 app.listen(PORT, async () => {
-    console.log(`Servidor rodando em http://localhost:${PORT}`);
+    console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
     try {
         await redisClient.connect();
         console.log('✅ Conexão com Redis estabelecida!');
@@ -687,10 +728,12 @@ app.listen(PORT, async () => {
         if (process.env.GOOGLE_REFRESH_TOKEN) {
             console.log('✅ OAuth2 configurado com refresh_token');
         } else {
-            console.log('⚠️ Acesse http://localhost:3000/auth para configurar OAuth2');
+            console.log('⚠️ Acesse /auth para configurar OAuth2');
         }
+        
+        console.log('🔐 Sistema de autenticação reforçado ativo');
     } catch (error) {
-        console.error('❌ ERRO CRÍTICO: Falha ao conectar ao Redis. O servidor será encerrado.', error.message);
+        console.error('❌ ERRO CRÍTICO: Falha ao conectar ao Redis:', error.message);
         process.exit(1); 
     }
 });
